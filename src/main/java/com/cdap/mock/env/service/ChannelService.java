@@ -1,14 +1,14 @@
 package com.cdap.mock.env.service;
 
-import com.cdap.mock.biz.dao.cdapmysql.entity.ChannelEntity;
-import com.cdap.mock.biz.dao.cdapmysql.entity.FissileChannelEntity;
-import com.cdap.mock.biz.dao.cdapmysql.entity.ProjectEntity;
-import com.cdap.mock.biz.dao.cdapmysql.entity.SubChannelEntity;
-import com.cdap.mock.biz.dao.cdapmysql.entity.plus.SubChannelPlusEntity;
-import com.cdap.mock.biz.dao.cdapmysql.mapper.ChannelMapper;
-import com.cdap.mock.biz.dao.cdapmysql.mapper.FissileChannelMapper;
-import com.cdap.mock.biz.dao.cdapmysql.mapper.SubChannelMapper;
-import com.cdap.mock.biz.task.common.EnvLocalThread;
+import com.cdap.mock.platform.dao.cdapmysql.entity.ChannelEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.FissileChannelEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.ProjectEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.SubChannelEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.plus.SubChannelPlusEntity;
+import com.cdap.mock.platform.dao.cdapmysql.mapper.ChannelMapper;
+import com.cdap.mock.platform.dao.cdapmysql.mapper.FissileChannelMapper;
+import com.cdap.mock.platform.dao.cdapmysql.mapper.SubChannelMapper;
+import com.cdap.mock.platform.task.common.EnvLocalThread;
 import com.cdap.mock.vo.ProjectPlusEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

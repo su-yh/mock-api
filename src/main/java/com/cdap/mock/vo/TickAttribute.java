@@ -1,7 +1,7 @@
 package com.cdap.mock.vo;
 
-import com.cdap.mock.biz.dao.cdappgsql.entity.AdAdvertiserEntity;
-import com.cdap.mock.biz.dao.cdapmysql.entity.SubChannelEntity;
+import com.cdap.mock.platform.dao.cdappgsql.entity.AdAdvertiserEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.SubChannelEntity;
 import lombok.Data;
 
 import java.util.List;

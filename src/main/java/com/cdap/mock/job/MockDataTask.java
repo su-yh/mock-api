@@ -1,15 +1,15 @@
 package com.cdap.mock.job;
 
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
-import com.cdap.mock.biz.dao.cdapmysql.entity.ChannelEntity;
-import com.cdap.mock.biz.dao.cdapmysql.entity.SubChannelEntity;
-import com.cdap.mock.biz.dao.cdapmysql.entity.TbRechargeEntity;
-import com.cdap.mock.biz.dao.cdapmysql.entity.TbUserEntity;
-import com.cdap.mock.biz.dao.cdapmysql.entity.TbUserLoginEntity;
-import com.cdap.mock.biz.dao.cdapmysql.entity.TbWithdrawalEntity;
-import com.cdap.mock.biz.dao.cdappgsql.entity.AdAdvertiserEntity;
-import com.cdap.mock.biz.dao.mgr.entity.EnvPropertiesEntity;
-import com.cdap.mock.biz.task.common.EnvLocalThread;
+import com.cdap.mock.platform.dao.cdapmysql.entity.ChannelEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.SubChannelEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.TbRechargeEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.TbUserEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.TbUserLoginEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.TbWithdrawalEntity;
+import com.cdap.mock.platform.dao.cdappgsql.entity.AdAdvertiserEntity;
+import com.cdap.mock.platform.dao.mgr.entity.EnvPropertiesEntity;
+import com.cdap.mock.platform.task.common.EnvLocalThread;
 import com.cdap.mock.constants.MockModeEnums;
 import com.cdap.mock.mq.produce.RabbitProduceComponent;
 import com.cdap.mock.env.service.AdjustService;

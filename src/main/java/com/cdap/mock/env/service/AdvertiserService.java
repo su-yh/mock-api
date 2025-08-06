@@ -1,13 +1,13 @@
 package com.cdap.mock.env.service;
 
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
-import com.cdap.mock.biz.dao.cdapmysql.entity.ProjectEntity;
-import com.cdap.mock.biz.dao.cdapmysql.entity.SubChannelEntity;
-import com.cdap.mock.biz.dao.cdappgsql.entity.AdAdvertiserEntity;
-import com.cdap.mock.biz.dao.cdappgsql.entity.AdjustAdEntity;
-import com.cdap.mock.biz.dao.cdappgsql.entity.AdjustCostRecordEntity;
-import com.cdap.mock.biz.dao.cdappgsql.mapper.AdAdvertiserMapper;
-import com.cdap.mock.biz.dao.cdappgsql.mapper.AdjustCostRecordMapper;
+import com.cdap.mock.platform.dao.cdapmysql.entity.ProjectEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.SubChannelEntity;
+import com.cdap.mock.platform.dao.cdappgsql.entity.AdAdvertiserEntity;
+import com.cdap.mock.platform.dao.cdappgsql.entity.AdjustAdEntity;
+import com.cdap.mock.platform.dao.cdappgsql.entity.AdjustCostRecordEntity;
+import com.cdap.mock.platform.dao.cdappgsql.mapper.AdAdvertiserMapper;
+import com.cdap.mock.platform.dao.cdappgsql.mapper.AdjustCostRecordMapper;
 import com.cdap.mock.component.UuidComponent;
 import com.cdap.mock.constants.DataMockConstants;
 import com.cdap.mock.event.AdvertiserCreatedEvent;

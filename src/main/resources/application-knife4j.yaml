@@ -65,7 +65,7 @@ springdoc:
       paths-to-match:
         - "/env/**"
       packages-to-scan:
-        - "com.cdap.mock.biz.controller"
+        - "com.cdap.mock.platform.controller"
 
 
 ---

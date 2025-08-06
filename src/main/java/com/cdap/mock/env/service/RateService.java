@@ -1,8 +1,8 @@
 package com.cdap.mock.env.service;
 
-import com.cdap.mock.biz.dao.cdapmysql.entity.ProjectEntity;
-import com.cdap.mock.biz.dao.cdapmysql.entity.Rate;
-import com.cdap.mock.biz.dao.cdapmysql.mapper.RateMapper;
+import com.cdap.mock.platform.dao.cdapmysql.entity.ProjectEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.Rate;
+import com.cdap.mock.platform.dao.cdapmysql.mapper.RateMapper;
 import com.cdap.mock.util.CdapDateUtils;
 import com.cdap.mock.vo.ProjectPlusEntity;
 import com.github.benmanes.caffeine.cache.Cache;

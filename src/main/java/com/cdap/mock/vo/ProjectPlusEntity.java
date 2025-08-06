@@ -2,7 +2,7 @@ package com.cdap.mock.vo;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.cdap.mock.biz.dao.cdapmysql.entity.ProjectEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.ProjectEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 

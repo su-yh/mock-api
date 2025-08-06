@@ -1,9 +1,9 @@
 package com.cdap.mock.env.service;
 
-import com.cdap.mock.biz.dao.cdapmysql.entity.TbRechargeEntity;
-import com.cdap.mock.biz.dao.cdapmysql.entity.TbUserEntity;
-import com.cdap.mock.biz.dao.cdapmysql.mapper.TbRechargeMapper;
-import com.cdap.mock.biz.task.common.EnvLocalThread;
+import com.cdap.mock.platform.dao.cdapmysql.entity.TbRechargeEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.TbUserEntity;
+import com.cdap.mock.platform.dao.cdapmysql.mapper.TbRechargeMapper;
+import com.cdap.mock.platform.task.common.EnvLocalThread;
 import com.cdap.mock.component.UuidComponent;
 import com.cdap.mock.constants.DataMockConstants;
 import com.cdap.mock.util.CdapDateUtils;

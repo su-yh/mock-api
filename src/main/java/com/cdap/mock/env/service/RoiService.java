@@ -1,14 +1,14 @@
 package com.cdap.mock.env.service;
 
-import com.cdap.mock.biz.dao.cdapmysql.entity.ChannelEntity;
-import com.cdap.mock.biz.dao.cdapmysql.entity.CohortCalculationChannelCodeEntity;
-import com.cdap.mock.biz.dao.cdapmysql.entity.CohortRoiCalculationConfEntity;
-import com.cdap.mock.biz.dao.cdapmysql.entity.CohortRoiCalculationEntity;
-import com.cdap.mock.biz.dao.cdapmysql.entity.ProjectEntity;
-import com.cdap.mock.biz.dao.cdapmysql.entity.SubChannelEntity;
-import com.cdap.mock.biz.dao.cdapmysql.mapper.CohortCalculationChannelCodeMapper;
-import com.cdap.mock.biz.dao.cdapmysql.mapper.CohortRoiCalculationConfMapper;
-import com.cdap.mock.biz.dao.cdapmysql.mapper.CohortRoiCalculationMapper;
+import com.cdap.mock.platform.dao.cdapmysql.entity.ChannelEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.CohortCalculationChannelCodeEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.CohortRoiCalculationConfEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.CohortRoiCalculationEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.ProjectEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.SubChannelEntity;
+import com.cdap.mock.platform.dao.cdapmysql.mapper.CohortCalculationChannelCodeMapper;
+import com.cdap.mock.platform.dao.cdapmysql.mapper.CohortRoiCalculationConfMapper;
+import com.cdap.mock.platform.dao.cdapmysql.mapper.CohortRoiCalculationMapper;
 import com.cdap.mock.vo.ProjectPlusEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,7 +1,7 @@
 package com.cdap.mock.mvc;
 
 import com.base.web.response.wrapper.WrapperResponseScanPackages;
-import com.cdap.mock.biz.controller.EnvConfigurationController;
+import com.cdap.mock.platform.controller.EnvConfigurationController;
 
 import java.util.Collection;
 import java.util.Collections;

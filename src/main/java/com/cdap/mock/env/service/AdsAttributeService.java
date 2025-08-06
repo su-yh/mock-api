@@ -1,12 +1,12 @@
 package com.cdap.mock.env.service;
 
-import com.cdap.mock.biz.dao.cdapmysql.entity.ChannelEntity;
-import com.cdap.mock.biz.dao.cdapmysql.entity.SubChannelEntity;
-import com.cdap.mock.biz.dao.cdappgsql.entity.AdAdvertiserCampaignEntity;
-import com.cdap.mock.biz.dao.cdappgsql.entity.AdAdvertiserEntity;
-import com.cdap.mock.biz.dao.cdappgsql.entity.AdjustAdEntity;
-import com.cdap.mock.biz.dao.cdappgsql.mapper.AdAdvertiserCampaignMapper;
-import com.cdap.mock.biz.dao.cdappgsql.mapper.AdjustAdMapper;
+import com.cdap.mock.platform.dao.cdapmysql.entity.ChannelEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.SubChannelEntity;
+import com.cdap.mock.platform.dao.cdappgsql.entity.AdAdvertiserCampaignEntity;
+import com.cdap.mock.platform.dao.cdappgsql.entity.AdAdvertiserEntity;
+import com.cdap.mock.platform.dao.cdappgsql.entity.AdjustAdEntity;
+import com.cdap.mock.platform.dao.cdappgsql.mapper.AdAdvertiserCampaignMapper;
+import com.cdap.mock.platform.dao.cdappgsql.mapper.AdjustAdMapper;
 import com.cdap.mock.component.UuidComponent;
 import com.cdap.mock.constants.CommonConstants;
 import com.cdap.mock.event.AdvertiserCreatedEvent;

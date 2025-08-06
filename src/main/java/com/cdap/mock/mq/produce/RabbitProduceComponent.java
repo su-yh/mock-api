@@ -1,10 +1,10 @@
 package com.cdap.mock.mq.produce;
 
 import com.base.web.util.JsonUtils;
-import com.cdap.mock.biz.dao.cdapmysql.entity.TbRechargeEntity;
-import com.cdap.mock.biz.dao.cdapmysql.entity.TbUserEntity;
-import com.cdap.mock.biz.dao.cdapmysql.entity.TbUserLoginEntity;
-import com.cdap.mock.biz.dao.cdapmysql.entity.TbWithdrawalEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.TbRechargeEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.TbUserEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.TbUserLoginEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.TbWithdrawalEntity;
 import com.cdap.mock.config.properties.DataRabbitMqProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

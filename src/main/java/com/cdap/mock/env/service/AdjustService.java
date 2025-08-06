@@ -1,9 +1,9 @@
 package com.cdap.mock.env.service;
 
-import com.cdap.mock.biz.dao.cdapmysql.entity.TbUserEntity;
-import com.cdap.mock.biz.dao.cdappgsql.entity.AdjustAdEntity;
-import com.cdap.mock.biz.dao.cdappgsql.entity.AdjustUserEntity;
-import com.cdap.mock.biz.dao.cdappgsql.mapper.AdjustUserMapper;
+import com.cdap.mock.platform.dao.cdapmysql.entity.TbUserEntity;
+import com.cdap.mock.platform.dao.cdappgsql.entity.AdjustAdEntity;
+import com.cdap.mock.platform.dao.cdappgsql.entity.AdjustUserEntity;
+import com.cdap.mock.platform.dao.cdappgsql.mapper.AdjustUserMapper;
 import com.cdap.mock.vo.TickRuntime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

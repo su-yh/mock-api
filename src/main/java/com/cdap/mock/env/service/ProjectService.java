@@ -1,6 +1,6 @@
 package com.cdap.mock.env.service;
 
-import com.cdap.mock.biz.dao.cdapmysql.mapper.ProjectMapper;
+import com.cdap.mock.platform.dao.cdapmysql.mapper.ProjectMapper;
 import com.cdap.mock.constants.DataMockConstants;
 import com.cdap.mock.vo.ProjectPlusEntity;
 import lombok.RequiredArgsConstructor;

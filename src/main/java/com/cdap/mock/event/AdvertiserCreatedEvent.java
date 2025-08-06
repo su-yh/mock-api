@@ -1,6 +1,6 @@
 package com.cdap.mock.event;
 
-import com.cdap.mock.biz.dao.cdappgsql.entity.AdAdvertiserEntity;
+import com.cdap.mock.platform.dao.cdappgsql.entity.AdAdvertiserEntity;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.lang.NonNull;

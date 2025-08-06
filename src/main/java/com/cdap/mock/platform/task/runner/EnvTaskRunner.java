@@ -256,7 +256,12 @@ public class EnvTaskRunner extends Thread {
     }
 
     public void doMockByDateRage(long intervalMillis) {
-        long timestampBegin = mockPropertiesEntity.getTsBegin();
+        Long timestampBegin = mockDataTask.obtainDateRangeTimeBegin();
+        if (timestampBegin == null) {
+            log.error("timeBegin is null}");
+            return;
+        }
+
         long timestampEnd = mockPropertiesEntity.getTsEnd();
 
         for (long timestamp = timestampBegin; timestamp < timestampEnd; timestamp += intervalMillis) {

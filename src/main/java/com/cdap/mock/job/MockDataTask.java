@@ -1,17 +1,7 @@
 package com.cdap.mock.job;
 
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
-import com.cdap.mock.platform.dao.cdapmysql.entity.ChannelEntity;
-import com.cdap.mock.platform.dao.cdapmysql.entity.SubChannelEntity;
-import com.cdap.mock.platform.dao.cdapmysql.entity.TbRechargeEntity;
-import com.cdap.mock.platform.dao.cdapmysql.entity.TbUserEntity;
-import com.cdap.mock.platform.dao.cdapmysql.entity.TbUserLoginEntity;
-import com.cdap.mock.platform.dao.cdapmysql.entity.TbWithdrawalEntity;
-import com.cdap.mock.platform.dao.cdappgsql.entity.AdAdvertiserEntity;
-import com.cdap.mock.platform.dao.mgr.entity.MockPropertiesEntity;
-import com.cdap.mock.platform.task.common.EnvLocalThread;
 import com.cdap.mock.constants.MockModeEnums;
-import com.cdap.mock.mq.produce.RabbitProduceComponent;
 import com.cdap.mock.env.service.AdjustService;
 import com.cdap.mock.env.service.AdsAttributeService;
 import com.cdap.mock.env.service.AdvertiserService;
@@ -23,6 +13,16 @@ import com.cdap.mock.env.service.TbRechargeService;
 import com.cdap.mock.env.service.TbUserLoginService;
 import com.cdap.mock.env.service.TbUserService;
 import com.cdap.mock.env.service.TbWithdrawalService;
+import com.cdap.mock.mq.produce.RabbitProduceComponent;
+import com.cdap.mock.platform.dao.cdapmysql.entity.ChannelEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.SubChannelEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.TbRechargeEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.TbUserEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.TbUserLoginEntity;
+import com.cdap.mock.platform.dao.cdapmysql.entity.TbWithdrawalEntity;
+import com.cdap.mock.platform.dao.cdappgsql.entity.AdAdvertiserEntity;
+import com.cdap.mock.platform.dao.mgr.entity.MockPropertiesEntity;
+import com.cdap.mock.platform.task.common.EnvLocalThread;
 import com.cdap.mock.util.CdapDateUtils;
 import com.cdap.mock.util.CdapStopWatch;
 import com.cdap.mock.vo.ProjectPlusEntity;
@@ -31,6 +31,7 @@ import com.cdap.mock.vo.TickRuntime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 import java.time.Instant;
@@ -50,7 +51,7 @@ public class MockDataTask {
 
     private boolean initialization = false;
     private List<TickAttribute> tickAttributes;
-//    private Long timeBeginMillisByDateRange;
+    private Long timeBeginMillisByDateRange;
 
     private final Random random = new Random();
 
@@ -82,8 +83,8 @@ public class MockDataTask {
         List<AdAdvertiserEntity> adAdvertiserEntities = advertiserService.init();
         adsAttributeService.mockAdsAttribute(adAdvertiserEntities); // 新建的投放方，先调用此方法，原来的事件需要spring 容器
         adsAttributeService.init();
-        MockPropertiesEntity mockPropertiesEntity = EnvLocalThread.ENV_PROPERTIES_ENTITY_THREAD_LOCAL.get();
-        tbUserLoginService.init(mockPropertiesEntity.getTsBegin());
+        Long timeBegin = obtainDateRangeTimeBegin();
+        tbUserLoginService.init(timeBegin);
         roiService.init();
 
         initTickAttributeList();
@@ -254,24 +255,25 @@ public class MockDataTask {
         }
     }
 
-//    @Nullable
-//    public Long obtainDateRangeTimeBegin() {
-//        if (!properties.getMockMode().equals(MockModeEnums.DATE_RAGE)) {
-//            return null;
-//        }
-//
-//        if (timeBeginMillisByDateRange == null) {
-//            LocalDateTime timeBegin = properties.getTimeBegin();
-//            timeBeginMillisByDateRange = timeBegin.atZone(ZoneId.systemDefault()).toEpochSecond() * 1000L;
-//
-//            Long registryMaxCtime = tbUserService.obtainMaxCtime();
-//            if (registryMaxCtime != null) {
-//                registryMaxCtime += 60; // 不能以数据库中存在的时间作为开始时间，需要往后延迟一段时间才可以。
-//
-//                timeBeginMillisByDateRange = Math.max(registryMaxCtime * 1000L, timeBeginMillisByDateRange);
-//            }
-//        }
-//
-//        return timeBeginMillisByDateRange;
-//    }
+    @Nullable
+    public synchronized Long obtainDateRangeTimeBegin() {
+        MockPropertiesEntity mockPropertiesEntity = EnvLocalThread.ENV_PROPERTIES_ENTITY_THREAD_LOCAL.get();
+        MockModeEnums mode = mockPropertiesEntity.getMode();
+        if (mode != MockModeEnums.DATE_RAGE) {
+            return null;
+        }
+
+        if (timeBeginMillisByDateRange == null) {
+            timeBeginMillisByDateRange = mockPropertiesEntity.getTsBegin();
+
+            Long registryMaxCtime = tbUserService.obtainMaxCtime();
+            if (registryMaxCtime != null) {
+                registryMaxCtime += 60; // 不能以数据库中存在的时间作为开始时间，需要往后延迟一段时间才可以。
+
+                timeBeginMillisByDateRange = Math.max(registryMaxCtime * 1000L, timeBeginMillisByDateRange);
+            }
+        }
+
+        return timeBeginMillisByDateRange;
+    }
 }

@@ -1,0 +1,106 @@
+
+
+drop table  if EXISTS tb_user;
+CREATE TABLE `tb_user`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `uid` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户id',
+  `channel` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '渠道号',
+  `ctime` bigint(20) NULL DEFAULT NULL COMMENT '创建时间',
+  `gaid` varchar(225) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '谷歌广告ID',
+  `origin_channel` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '原始渠道',
+  `vungo_user_id` bigint(20) NULL DEFAULT NULL COMMENT '原数据id',
+  `day` bigint(20) NULL DEFAULT NULL COMMENT '日期',
+  `cts` bigint(20) NULL DEFAULT NULL COMMENT '数据入库时间',
+  `pn` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT 'pn',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_uid_pn`(`uid`, `pn`) USING BTREE,
+  INDEX `idx_t_u_c_d`(`channel`, `day`) USING BTREE,
+  INDEX `idx_t_u_gaid`(`gaid`) USING BTREE,
+  INDEX `idx_t_u_o_d`(`origin_channel`, `day`) USING BTREE,
+  INDEX `idx_t_u_d`(`day`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+
+
+
+
+drop table  if EXISTS tb_user_login;
+CREATE TABLE `tb_user_login`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `uid` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户id',
+  `src` int(11) NULL DEFAULT NULL COMMENT '1：用户注册；2：用户登录',
+  `channel` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '渠道号',
+  `ctime` bigint(20) NULL DEFAULT NULL COMMENT '创建时间',
+  `gaid` varchar(225) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '谷歌广告ID',
+  `origin_channel` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '原始渠道',
+  `vungo_user_login_id` bigint(20) NULL DEFAULT NULL COMMENT '原数据id',
+  `day` bigint(20) NULL DEFAULT NULL COMMENT '日期',
+  `cts` bigint(20) NULL DEFAULT NULL COMMENT '数据入库时间',
+  `pn` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT 'pn',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_u_c_g_d_p`(`uid`, `channel`, `gaid`, `day`, `pn`) USING BTREE,
+  INDEX `idx_t_u_u_o_d`(`origin_channel`, `day`) USING BTREE,
+  INDEX `idx_t_u_l_gaid`(`gaid`) USING BTREE,
+  INDEX `idx_t_u_u_c_d`(`uid`, `channel`, `day`) USING BTREE,
+  INDEX `idx_t_u_c_g_u`(`channel`, `gaid`, `uid`) USING BTREE,
+  INDEX `idx_t_u_l_c_d`(`channel`, `day`) USING BTREE,
+  INDEX `idx_t_d`(`day`) USING BTREE
+) ENGINE = InnoDB;
+
+
+drop table  if EXISTS tb_recharge;
+CREATE TABLE `tb_recharge`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `uid` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户id',
+  `ctime` bigint(20) NULL DEFAULT NULL COMMENT '订单创建时间',
+  `goods_amt` decimal(11, 2) NULL DEFAULT NULL COMMENT '商品额度，卢比',
+  `channel` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '归因渠道号',
+  `chips` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '充值类型',
+  `vungo_recharge_id` bigint(20) NOT NULL COMMENT '原数据id',
+  `gaid` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT 'gaid',
+  `origin_channel` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '原始渠道',
+  `day` bigint(20) NULL DEFAULT NULL COMMENT '日期',
+  `order` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '订单号',
+  `cts` bigint(20) NULL DEFAULT NULL COMMENT '数据入库时间',
+  `pn` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT 'pn',
+  `mtime` bigint(20) NULL DEFAULT NULL COMMENT '订单修改时间',
+  `login_channel` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '登录渠道号',
+  `register_channel` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '注册渠道号',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_order_pn`(`order`, `pn`) USING BTREE,
+  INDEX `idx_t_r_uid`(`uid`) USING BTREE,
+  INDEX `idx_t_r_gaid`(`gaid`) USING BTREE,
+  INDEX `idx_t_r_o_d`(`origin_channel`, `day`) USING BTREE,
+  INDEX `idx_t_r_c_d`(`channel`, `day`) USING BTREE,
+  INDEX `idx_uid_amt`(`uid`, `goods_amt`) USING BTREE,
+  INDEX `idx_g_c_a`(`goods_amt`, `gaid`, `day`, `channel`) USING BTREE,
+  INDEX `index_cts`(`cts`) USING BTREE,
+  INDEX `idx_day_channel`(`day`, `channel`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+
+
+drop table  if EXISTS tb_withdrawal;
+CREATE TABLE `tb_withdrawal`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `uid` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户id',
+  `ctime` bigint(20) NULL DEFAULT NULL COMMENT '创建时间',
+  `amount` decimal(11, 2) NULL DEFAULT NULL COMMENT '提现金额',
+  `channel` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '归因渠道号',
+  `vungo_withdrawal_id` bigint(20) NULL DEFAULT NULL COMMENT 'vungo提现数据id',
+  `origin_channel` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '原渠道',
+  `gaid` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT 'gaid',
+  `day` bigint(20) NULL DEFAULT NULL COMMENT '日期',
+  `order` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `cts` bigint(20) NULL DEFAULT NULL COMMENT '数据入库时间',
+  `pn` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT 'pn',
+  `mtime` bigint(20) NULL DEFAULT NULL COMMENT '订单修改时间，秒',
+  `login_channel` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '登录渠道号',
+  `register_channel` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '注册渠道号',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_order_pn`(`order`, `pn`) USING BTREE,
+  INDEX `idx_t_w_uid`(`uid`) USING BTREE,
+  INDEX `idx_t_w_gaid`(`gaid`) USING BTREE,
+  INDEX `idx_t_w_o_d`(`origin_channel`, `day`) USING BTREE,
+  INDEX `idx_t_w_c_d`(`channel`, `day`) USING BTREE,
+  INDEX `idx_cts`(`cts`) USING BTREE,
+  INDEX `idx_day_channel`(`day`, `channel`) USING BTREE
+) ENGINE = InnoDB;

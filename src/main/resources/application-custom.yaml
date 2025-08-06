@@ -1,0 +1,47 @@
+data:
+  mock:
+    plus:
+      mock-mode: none
+      time-begin: "2024-11-01 00:00:00"
+      time-end: "2024-11-15 00:00:00"
+      # 一共有5 个pn
+      # 目前来讲每个pn 下面只会对应一个channel
+      # 每个channel 的sub channel 数量，其中1/5 会被处理成裂变渠道
+      # 最终的sub channel 数量为 该配置值的5 倍
+      sub-channel-count: 600
+      # 每次tick 注册、登录、充值、提现的数量上限
+      # 生产环境一天的注册、登录、充值、提现数量大概：13W、71W、28W、10W
+      random-tb-user: 200
+      random-tb-user-login: 1200
+      random-tb-withdrawal: 500
+      random-tb-recharge: 100
+      rmq-enabled: false
+
+---
+spring:
+  config:
+    activate:
+      on-profile: suyh
+
+data:
+  mock:
+    plus:
+      mock-mode: date_rage
+      time-begin: "2025-03-01 00:00:00"
+      time-end: "2025-03-01 01:00:00"
+      # 一共有5 个pn
+      # 目前来讲每个pn 下面只会对应一个channel
+      # 每个channel 的sub channel 数量，其中1/5 会被处理成裂变渠道
+      # 最终的sub channel 数量为 该配置值的5 倍
+      sub-channel-count: 30
+      # 每次tick 注册、登录、充值、提现的数量上限
+      # 生产环境一天的注册、登录、充值、提现数量大概：1.3W、7W、2.8W、1W
+      random-tb-user: 20
+      random-tb-user-login: 120
+      random-tb-withdrawal: 50
+      random-tb-recharge: 10
+      rmq-enabled: false
+
+
+
+

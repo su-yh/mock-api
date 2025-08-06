@@ -1,0 +1,54 @@
+
+---
+spring:
+  config:
+    activate:
+      on-profile: beta
+
+  rabbitmq:
+    host: 192.168.8.56
+    port: 5672
+    username: admin
+    password: aiteer
+    virtualHost: /flinkBeta
+mq:
+  flink:
+    produce:
+      common-exchange: mockUserBehaviorExchange
+      # user registry
+      user-registry-routingkey: tbUserRegistry
+      # user login
+      user-login-routingkey: tbUserLogin
+      # user recharge
+      user-recharge-routingkey: tbUserRecharge
+      # user withdrawal
+      user-withdrawal-routingkey: tbUserWithdrawal
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: suyh
+
+
+  rabbitmq:
+    host: 192.168.8.143
+    port: 5672
+    username: suyh
+    password: suyh
+    virtualHost: /suyhCdapFlink
+
+mq:
+  flink:
+    produce:
+      common-exchange: mockUserBehaviorExchange
+      # user registry
+      user-registry-routingkey: tbUserRegistry
+      # user login
+      user-login-routingkey: tbUserLogin
+      # user recharge
+      user-recharge-routingkey: tbUserRecharge
+      # user withdrawal
+      user-withdrawal-routingkey: tbUserWithdrawal
+

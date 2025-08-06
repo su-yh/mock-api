@@ -1,0 +1,7 @@
+CREATE INDEX idx_fb_ad_resource_advertising_account_id ON fb_ad_resource (advertising_account_id);
+
+CREATE INDEX idx_fb_ad_set_resource_advertising_account_id ON fb_ad_set_resource (advertising_account_id);
+
+CREATE INDEX idx_fb_ad_campaign_resource_advertising_account_id ON fb_ad_campaign_resource (advertising_account_id);
+
+CREATE INDEX idx_fb_ad_material_resource_advertising_account_id ON fb_ad_material_resource (advertising_account_id);

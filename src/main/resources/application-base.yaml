@@ -1,0 +1,7 @@
+sys:
+  web:
+    user:
+      captcha:
+        two-factor-auth-enabled: false
+
+

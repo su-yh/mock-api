@@ -1,0 +1,85 @@
+
+-- TODO: suyh - 这里面全是触发器，暂时不执行这些触发器。
+
+
+-- -- ----------------------------
+-- -- Triggers structure for table cohort_cost_calculate_trend
+-- -- ----------------------------
+-- DROP TRIGGER IF EXISTS `pt_osc_cds_cohort_cost_calculate_trend_ins`;
+-- delimiter ;;
+-- CREATE TRIGGER `pt_osc_cds_cohort_cost_calculate_trend_ins` AFTER INSERT ON `cohort_cost_calculate_trend` FOR EACH ROW BEGIN DECLARE CONTINUE HANDLER FOR 1146 begin end; REPLACE INTO `_cohort_cost_calculate_trend_new` (`id`, `dates`, `active`, `bdates`, `taurus_income`, `key`, `channelid`, `google_ads_campaign_id`, `google_ads_adgroup_id`, `google_ads_creative_id`, `fb_campaign_group_id`, `fb_campaign_id`, `fb_adgroup_id`, `is_organic`, `source`, `dayretention`, `allretention`, `dayrecharge`, `allrecharge`, `dayrechargecount`, `allrechargecount`, `daywithdraw`, `allwithdraw`, `dayincome`, `allincome`, `daygrossprofit`, `allgrossprofit`, `daynetprofit`, `allnetprofit`, `daycost`, `allcost`, `allroi`, `final_day_recharge`, `final_day_withdraw`, `day_delivery_revenue`, `final_delivery_revenue`, `day_fission_revenue`, `day_sharing_fission_revenue`, `day_revenue`, `final_day_revenue`, `final_all_roi`, `final_all_revenue`, `updatetime`, `remarkt`, `rebate_to_agent`, `final_all_recharge`, `final_all_roas`, `dynamic_dimension`, `device_activation`, `new_cost`, `stream_divided_roas`, `stream_divided_roi`, `profit_divided_roas`, `profit_divided_roi`, `pn`) VALUES (NEW.`id`, NEW.`dates`, NEW.`active`, NEW.`bdates`, NEW.`taurus_income`, NEW.`key`, NEW.`channelid`, NEW.`google_ads_campaign_id`, NEW.`google_ads_adgroup_id`, NEW.`google_ads_creative_id`, NEW.`fb_campaign_group_id`, NEW.`fb_campaign_id`, NEW.`fb_adgroup_id`, NEW.`is_organic`, NEW.`source`, NEW.`dayretention`, NEW.`allretention`, NEW.`dayrecharge`, NEW.`allrecharge`, NEW.`dayrechargecount`, NEW.`allrechargecount`, NEW.`daywithdraw`, NEW.`allwithdraw`, NEW.`dayincome`, NEW.`allincome`, NEW.`daygrossprofit`, NEW.`allgrossprofit`, NEW.`daynetprofit`, NEW.`allnetprofit`, NEW.`daycost`, NEW.`allcost`, NEW.`allroi`, NEW.`final_day_recharge`, NEW.`final_day_withdraw`, NEW.`day_delivery_revenue`, NEW.`final_delivery_revenue`, NEW.`day_fission_revenue`, NEW.`day_sharing_fission_revenue`, NEW.`day_revenue`, NEW.`final_day_revenue`, NEW.`final_all_roi`, NEW.`final_all_revenue`, NEW.`updatetime`, NEW.`remarkt`, NEW.`rebate_to_agent`, NEW.`final_all_recharge`, NEW.`final_all_roas`, NEW.`dynamic_dimension`, NEW.`device_activation`, NEW.`new_cost`, NEW.`stream_divided_roas`, NEW.`stream_divided_roi`, NEW.`profit_divided_roas`, NEW.`profit_divided_roi`, NEW.`pn`);END
+-- ;;
+-- delimiter ;
+--
+-- -- ----------------------------
+-- -- Triggers structure for table cohort_cost_calculate_trend
+-- -- ----------------------------
+-- DROP TRIGGER IF EXISTS `pt_osc_cds_cohort_cost_calculate_trend_upd`;
+-- delimiter ;;
+-- CREATE TRIGGER `pt_osc_cds_cohort_cost_calculate_trend_upd` AFTER UPDATE ON `cohort_cost_calculate_trend` FOR EACH ROW BEGIN DECLARE CONTINUE HANDLER FOR 1146 begin end; DELETE IGNORE FROM `_cohort_cost_calculate_trend_new` WHERE !(OLD.`id` <=> NEW.`id`) AND `_cohort_cost_calculate_trend_new`.`id` <=> OLD.`id`; REPLACE INTO `_cohort_cost_calculate_trend_new` (`id`, `dates`, `active`, `bdates`, `taurus_income`, `key`, `channelid`, `google_ads_campaign_id`, `google_ads_adgroup_id`, `google_ads_creative_id`, `fb_campaign_group_id`, `fb_campaign_id`, `fb_adgroup_id`, `is_organic`, `source`, `dayretention`, `allretention`, `dayrecharge`, `allrecharge`, `dayrechargecount`, `allrechargecount`, `daywithdraw`, `allwithdraw`, `dayincome`, `allincome`, `daygrossprofit`, `allgrossprofit`, `daynetprofit`, `allnetprofit`, `daycost`, `allcost`, `allroi`, `final_day_recharge`, `final_day_withdraw`, `day_delivery_revenue`, `final_delivery_revenue`, `day_fission_revenue`, `day_sharing_fission_revenue`, `day_revenue`, `final_day_revenue`, `final_all_roi`, `final_all_revenue`, `updatetime`, `remarkt`, `rebate_to_agent`, `final_all_recharge`, `final_all_roas`, `dynamic_dimension`, `device_activation`, `new_cost`, `stream_divided_roas`, `stream_divided_roi`, `profit_divided_roas`, `profit_divided_roi`, `pn`) VALUES (NEW.`id`, NEW.`dates`, NEW.`active`, NEW.`bdates`, NEW.`taurus_income`, NEW.`key`, NEW.`channelid`, NEW.`google_ads_campaign_id`, NEW.`google_ads_adgroup_id`, NEW.`google_ads_creative_id`, NEW.`fb_campaign_group_id`, NEW.`fb_campaign_id`, NEW.`fb_adgroup_id`, NEW.`is_organic`, NEW.`source`, NEW.`dayretention`, NEW.`allretention`, NEW.`dayrecharge`, NEW.`allrecharge`, NEW.`dayrechargecount`, NEW.`allrechargecount`, NEW.`daywithdraw`, NEW.`allwithdraw`, NEW.`dayincome`, NEW.`allincome`, NEW.`daygrossprofit`, NEW.`allgrossprofit`, NEW.`daynetprofit`, NEW.`allnetprofit`, NEW.`daycost`, NEW.`allcost`, NEW.`allroi`, NEW.`final_day_recharge`, NEW.`final_day_withdraw`, NEW.`day_delivery_revenue`, NEW.`final_delivery_revenue`, NEW.`day_fission_revenue`, NEW.`day_sharing_fission_revenue`, NEW.`day_revenue`, NEW.`final_day_revenue`, NEW.`final_all_roi`, NEW.`final_all_revenue`, NEW.`updatetime`, NEW.`remarkt`, NEW.`rebate_to_agent`, NEW.`final_all_recharge`, NEW.`final_all_roas`, NEW.`dynamic_dimension`, NEW.`device_activation`, NEW.`new_cost`, NEW.`stream_divided_roas`, NEW.`stream_divided_roi`, NEW.`profit_divided_roas`, NEW.`profit_divided_roi`, NEW.`pn`); END
+-- ;;
+-- delimiter ;
+--
+-- -- ----------------------------
+-- -- Triggers structure for table cohort_cost_calculate_trend
+-- -- ----------------------------
+-- DROP TRIGGER IF EXISTS `pt_osc_cds_cohort_cost_calculate_trend_del`;
+-- delimiter ;;
+-- CREATE TRIGGER `pt_osc_cds_cohort_cost_calculate_trend_del` AFTER DELETE ON `cohort_cost_calculate_trend` FOR EACH ROW BEGIN DECLARE CONTINUE HANDLER FOR 1146 begin end; DELETE IGNORE FROM `_cohort_cost_calculate_trend_new` WHERE `_cohort_cost_calculate_trend_new`.`id` <=> OLD.`id`; END
+-- ;;
+-- delimiter ;
+--
+-- -- ----------------------------
+-- -- Triggers structure for table cohort_cost_calculate_trend_pre
+-- -- ----------------------------
+-- DROP TRIGGER IF EXISTS `pt_osc_cds_cohort_cost_calculate_trend_ins_copy1`;
+-- delimiter ;;
+-- CREATE TRIGGER `pt_osc_cds_cohort_cost_calculate_trend_ins_copy1` AFTER INSERT ON `cohort_cost_calculate_trend_pre` FOR EACH ROW BEGIN DECLARE CONTINUE HANDLER FOR 1146 begin end; REPLACE INTO `_cohort_cost_calculate_trend_new` (`id`, `dates`, `active`, `bdates`, `taurus_income`, `key`, `channelid`, `google_ads_campaign_id`, `google_ads_adgroup_id`, `google_ads_creative_id`, `fb_campaign_group_id`, `fb_campaign_id`, `fb_adgroup_id`, `is_organic`, `source`, `dayretention`, `allretention`, `dayrecharge`, `allrecharge`, `dayrechargecount`, `allrechargecount`, `daywithdraw`, `allwithdraw`, `dayincome`, `allincome`, `daygrossprofit`, `allgrossprofit`, `daynetprofit`, `allnetprofit`, `daycost`, `allcost`, `allroi`, `final_day_recharge`, `final_day_withdraw`, `day_delivery_revenue`, `final_delivery_revenue`, `day_fission_revenue`, `day_sharing_fission_revenue`, `day_revenue`, `final_day_revenue`, `final_all_roi`, `final_all_revenue`, `updatetime`, `remarkt`, `rebate_to_agent`, `final_all_recharge`, `final_all_roas`, `dynamic_dimension`, `device_activation`, `new_cost`, `stream_divided_roas`, `stream_divided_roi`, `profit_divided_roas`, `profit_divided_roi`, `pn`) VALUES (NEW.`id`, NEW.`dates`, NEW.`active`, NEW.`bdates`, NEW.`taurus_income`, NEW.`key`, NEW.`channelid`, NEW.`google_ads_campaign_id`, NEW.`google_ads_adgroup_id`, NEW.`google_ads_creative_id`, NEW.`fb_campaign_group_id`, NEW.`fb_campaign_id`, NEW.`fb_adgroup_id`, NEW.`is_organic`, NEW.`source`, NEW.`dayretention`, NEW.`allretention`, NEW.`dayrecharge`, NEW.`allrecharge`, NEW.`dayrechargecount`, NEW.`allrechargecount`, NEW.`daywithdraw`, NEW.`allwithdraw`, NEW.`dayincome`, NEW.`allincome`, NEW.`daygrossprofit`, NEW.`allgrossprofit`, NEW.`daynetprofit`, NEW.`allnetprofit`, NEW.`daycost`, NEW.`allcost`, NEW.`allroi`, NEW.`final_day_recharge`, NEW.`final_day_withdraw`, NEW.`day_delivery_revenue`, NEW.`final_delivery_revenue`, NEW.`day_fission_revenue`, NEW.`day_sharing_fission_revenue`, NEW.`day_revenue`, NEW.`final_day_revenue`, NEW.`final_all_roi`, NEW.`final_all_revenue`, NEW.`updatetime`, NEW.`remarkt`, NEW.`rebate_to_agent`, NEW.`final_all_recharge`, NEW.`final_all_roas`, NEW.`dynamic_dimension`, NEW.`device_activation`, NEW.`new_cost`, NEW.`stream_divided_roas`, NEW.`stream_divided_roi`, NEW.`profit_divided_roas`, NEW.`profit_divided_roi`, NEW.`pn`);END
+-- ;;
+-- delimiter ;
+--
+-- -- ----------------------------
+-- -- Triggers structure for table cohort_cost_calculate_trend_pre
+-- -- ----------------------------
+-- DROP TRIGGER IF EXISTS `pt_osc_cds_cohort_cost_calculate_trend_upd_copy1`;
+-- delimiter ;;
+-- CREATE TRIGGER `pt_osc_cds_cohort_cost_calculate_trend_upd_copy1` AFTER UPDATE ON `cohort_cost_calculate_trend_pre` FOR EACH ROW BEGIN DECLARE CONTINUE HANDLER FOR 1146 begin end; DELETE IGNORE FROM `_cohort_cost_calculate_trend_new` WHERE !(OLD.`id` <=> NEW.`id`) AND `_cohort_cost_calculate_trend_new`.`id` <=> OLD.`id`; REPLACE INTO `_cohort_cost_calculate_trend_new` (`id`, `dates`, `active`, `bdates`, `taurus_income`, `key`, `channelid`, `google_ads_campaign_id`, `google_ads_adgroup_id`, `google_ads_creative_id`, `fb_campaign_group_id`, `fb_campaign_id`, `fb_adgroup_id`, `is_organic`, `source`, `dayretention`, `allretention`, `dayrecharge`, `allrecharge`, `dayrechargecount`, `allrechargecount`, `daywithdraw`, `allwithdraw`, `dayincome`, `allincome`, `daygrossprofit`, `allgrossprofit`, `daynetprofit`, `allnetprofit`, `daycost`, `allcost`, `allroi`, `final_day_recharge`, `final_day_withdraw`, `day_delivery_revenue`, `final_delivery_revenue`, `day_fission_revenue`, `day_sharing_fission_revenue`, `day_revenue`, `final_day_revenue`, `final_all_roi`, `final_all_revenue`, `updatetime`, `remarkt`, `rebate_to_agent`, `final_all_recharge`, `final_all_roas`, `dynamic_dimension`, `device_activation`, `new_cost`, `stream_divided_roas`, `stream_divided_roi`, `profit_divided_roas`, `profit_divided_roi`, `pn`) VALUES (NEW.`id`, NEW.`dates`, NEW.`active`, NEW.`bdates`, NEW.`taurus_income`, NEW.`key`, NEW.`channelid`, NEW.`google_ads_campaign_id`, NEW.`google_ads_adgroup_id`, NEW.`google_ads_creative_id`, NEW.`fb_campaign_group_id`, NEW.`fb_campaign_id`, NEW.`fb_adgroup_id`, NEW.`is_organic`, NEW.`source`, NEW.`dayretention`, NEW.`allretention`, NEW.`dayrecharge`, NEW.`allrecharge`, NEW.`dayrechargecount`, NEW.`allrechargecount`, NEW.`daywithdraw`, NEW.`allwithdraw`, NEW.`dayincome`, NEW.`allincome`, NEW.`daygrossprofit`, NEW.`allgrossprofit`, NEW.`daynetprofit`, NEW.`allnetprofit`, NEW.`daycost`, NEW.`allcost`, NEW.`allroi`, NEW.`final_day_recharge`, NEW.`final_day_withdraw`, NEW.`day_delivery_revenue`, NEW.`final_delivery_revenue`, NEW.`day_fission_revenue`, NEW.`day_sharing_fission_revenue`, NEW.`day_revenue`, NEW.`final_day_revenue`, NEW.`final_all_roi`, NEW.`final_all_revenue`, NEW.`updatetime`, NEW.`remarkt`, NEW.`rebate_to_agent`, NEW.`final_all_recharge`, NEW.`final_all_roas`, NEW.`dynamic_dimension`, NEW.`device_activation`, NEW.`new_cost`, NEW.`stream_divided_roas`, NEW.`stream_divided_roi`, NEW.`profit_divided_roas`, NEW.`profit_divided_roi`, NEW.`pn`); END
+-- ;;
+-- delimiter ;
+--
+-- -- ----------------------------
+-- -- Triggers structure for table cohort_cost_calculate_trend_pre
+-- -- ----------------------------
+-- DROP TRIGGER IF EXISTS `pt_osc_cds_cohort_cost_calculate_trend_del_copy1`;
+-- delimiter ;;
+-- CREATE TRIGGER `pt_osc_cds_cohort_cost_calculate_trend_del_copy1` AFTER DELETE ON `cohort_cost_calculate_trend_pre` FOR EACH ROW BEGIN DECLARE CONTINUE HANDLER FOR 1146 begin end; DELETE IGNORE FROM `_cohort_cost_calculate_trend_new` WHERE `_cohort_cost_calculate_trend_new`.`id` <=> OLD.`id`; END
+-- ;;
+-- delimiter ;
+--
+-- -- ----------------------------
+-- -- Triggers structure for table tb_recharge
+-- -- ----------------------------
+-- DROP TRIGGER IF EXISTS `pt_osc_cds_tb_recharge_ins`;
+-- delimiter ;;
+-- CREATE TRIGGER `pt_osc_cds_tb_recharge_ins` AFTER INSERT ON `tb_recharge` FOR EACH ROW BEGIN DECLARE CONTINUE HANDLER FOR 1146 begin end; REPLACE INTO `_tb_recharge_new` (`id`, `uid`, `ctime`, `goods_amt`, `channel`, `chips`, `vungo_recharge_id`, `gaid`, `origin_channel`, `day`, `order`, `cts`, `pn`, `mtime`, `login_channel`, `register_channel`) VALUES (NEW.`id`, NEW.`uid`, NEW.`ctime`, NEW.`goods_amt`, NEW.`channel`, NEW.`chips`, NEW.`vungo_recharge_id`, NEW.`gaid`, NEW.`origin_channel`, NEW.`day`, NEW.`order`, NEW.`cts`, NEW.`pn`, NEW.`mtime`, NEW.`login_channel`, NEW.`register_channel`);END
+-- ;;
+-- delimiter ;
+--
+-- -- ----------------------------
+-- -- Triggers structure for table tb_recharge
+-- -- ----------------------------
+-- DROP TRIGGER IF EXISTS `pt_osc_cds_tb_recharge_upd`;
+-- delimiter ;;
+-- CREATE TRIGGER `pt_osc_cds_tb_recharge_upd` AFTER UPDATE ON `tb_recharge` FOR EACH ROW BEGIN DECLARE CONTINUE HANDLER FOR 1146 begin end; DELETE IGNORE FROM `_tb_recharge_new` WHERE !(OLD.`id` <=> NEW.`id`) AND `_tb_recharge_new`.`id` <=> OLD.`id`; REPLACE INTO `_tb_recharge_new` (`id`, `uid`, `ctime`, `goods_amt`, `channel`, `chips`, `vungo_recharge_id`, `gaid`, `origin_channel`, `day`, `order`, `cts`, `pn`, `mtime`, `login_channel`, `register_channel`) VALUES (NEW.`id`, NEW.`uid`, NEW.`ctime`, NEW.`goods_amt`, NEW.`channel`, NEW.`chips`, NEW.`vungo_recharge_id`, NEW.`gaid`, NEW.`origin_channel`, NEW.`day`, NEW.`order`, NEW.`cts`, NEW.`pn`, NEW.`mtime`, NEW.`login_channel`, NEW.`register_channel`); END
+-- ;;
+-- delimiter ;
+--
+-- -- ----------------------------
+-- -- Triggers structure for table tb_recharge
+-- -- ----------------------------
+-- DROP TRIGGER IF EXISTS `pt_osc_cds_tb_recharge_del`;
+-- delimiter ;;
+-- CREATE TRIGGER `pt_osc_cds_tb_recharge_del` AFTER DELETE ON `tb_recharge` FOR EACH ROW BEGIN DECLARE CONTINUE HANDLER FOR 1146 begin end; DELETE IGNORE FROM `_tb_recharge_new` WHERE `_tb_recharge_new`.`id` <=> OLD.`id`; END
+-- ;;
+-- delimiter ;
+

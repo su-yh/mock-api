@@ -1,0 +1,98 @@
+spring:
+  datasource:
+    dynamic:
+      enabled: true
+      strict: true
+      primary: "master"
+  flyway:
+    enabled: false
+#    hikari:
+#      multi:
+#        flink-cds:
+#          flyway:
+#            enabled: false
+#            locations:
+#              - "sqls/mysql/cdap/cds/history"
+#              - "sqls/mysql/cdap/cds/increment"
+#              - "sqls/mysql/cdap/cds/increment_plus"
+#              - "sqls/mysql/cdap/cds/data_mock"
+#        flink-pg-cdap:
+#          flyway:
+#            enabled: false
+#            locations:
+#              - "sqls/pgsql/common/history"
+#              - "sqls/pgsql/common/increment"
+#              - "sqls/pgsql/common/other"
+base:
+  datasource:
+    hikari:
+      master:
+        flyway:
+          enabled: false
+          out-of-order: true
+          locations:
+            - "sqls/mysql/sys/base"
+            - "mock/sqls"
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: suyh
+
+
+#  datasource:
+#    hikari:
+#      multi:
+#        flink-cds:
+#          jdbc-url: jdbc:mysql://192.168.8.143:3306/suyh_cdap_cds?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&rewriteBatchedStatements=true&serverTimezone=Asia/Shanghai
+#          username: suyh_cdap_cds
+#          password: suyh_cdap_cds
+#          flyway:
+#            enabled: true
+#        flink-pg-cdap:
+#          jdbc-url: jdbc:postgresql://192.168.8.143:5432/suyh_pg_cdap_2_cds?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=Asia/Shanghai
+#          username: suyh_pg_cdap_2_cds
+#          password: suyh_pg_cdap_2_cds
+#          driver-class-name: org.postgresql.Driver
+#          flyway:
+#            enabled: true
+base:
+  datasource:
+    hikari:
+      master:
+        jdbc-url: jdbc:mysql://192.168.8.143:3306/suyh_mock_mgr?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&rewriteBatchedStatements=true&serverTimezone=Asia/Shanghai
+        username: suyh_mock_mgr
+        password: suyh_mock_mgr
+        flyway:
+          enabled: true
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: beta
+#
+#  datasource:
+#    hikari:
+#      multi:
+#        flink-cds:
+#          jdbc-url: jdbc:mysql://192.168.8.56:3306/beta_cdap_cds?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&rewriteBatchedStatements=true
+#          username: beta_cdap_cds
+#          password: beta_cdap_cds
+#          flyway:
+#            enabled: true
+#        flink-pg-cdap:
+#          jdbc-url: jdbc:postgresql://192.168.8.56:5432/beta_pg_cdap_cds?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=Asia/Shanghai
+#          username: beta_pg_cdap_cds
+#          password: beta_pg_cdap_cds
+#          driver-class-name: org.postgresql.Driver
+#          flyway:
+#            enabled: true
+
+
+
+
+

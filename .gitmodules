@@ -1,0 +1,4 @@
+[submodule "flyway-cds-sql"]
+	path = src/main/resources/sqls
+	url = git@192.168.8.134:aiteer/flyway-cds-sql.git
+	branch = main

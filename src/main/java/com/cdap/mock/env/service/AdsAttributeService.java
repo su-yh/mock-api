@@ -1,5 +1,7 @@
 package com.cdap.mock.env.service;
 
+import com.cdap.mock.component.UuidComponent;
+import com.cdap.mock.constants.CommonConstants;
 import com.cdap.mock.platform.dao.cdapmysql.entity.ChannelEntity;
 import com.cdap.mock.platform.dao.cdapmysql.entity.SubChannelEntity;
 import com.cdap.mock.platform.dao.cdappgsql.entity.AdAdvertiserCampaignEntity;
@@ -7,15 +9,11 @@ import com.cdap.mock.platform.dao.cdappgsql.entity.AdAdvertiserEntity;
 import com.cdap.mock.platform.dao.cdappgsql.entity.AdjustAdEntity;
 import com.cdap.mock.platform.dao.cdappgsql.mapper.AdAdvertiserCampaignMapper;
 import com.cdap.mock.platform.dao.cdappgsql.mapper.AdjustAdMapper;
-import com.cdap.mock.component.UuidComponent;
-import com.cdap.mock.constants.CommonConstants;
-import com.cdap.mock.event.AdvertiserCreatedEvent;
 import com.cdap.mock.util.CdapStopWatch;
 import com.cdap.mock.vo.ProjectPlusEntity;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,11 +39,8 @@ public class AdsAttributeService {
     private final ProjectService projectService;
     private final ChannelService channelService;
 
-    @EventListener(AdvertiserCreatedEvent.class)
-    public void mockAdsAttribute(AdvertiserCreatedEvent event) {
-        List<AdAdvertiserEntity> entities = event.getEntities();
+    public void mockAdsAttribute(List<AdAdvertiserEntity> entities) {
         if (entities == null || entities.isEmpty()) {
-            log.warn("{}::entities empty.", AdvertiserCreatedEvent.class.getSimpleName());
             return;
         }
 

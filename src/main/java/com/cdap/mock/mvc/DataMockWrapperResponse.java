@@ -1,7 +1,7 @@
 package com.cdap.mock.mvc;
 
 import com.base.web.response.wrapper.WrapperResponseScanPackages;
-import com.cdap.mock.platform.controller.EnvConfigurationController;
+import com.cdap.mock.platform.controller.MockConfigurationController;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -13,6 +13,6 @@ import java.util.Collections;
 public class DataMockWrapperResponse implements WrapperResponseScanPackages {
     @Override
     public Collection<String> getScanPackages() {
-        return Collections.singletonList(EnvConfigurationController.class.getPackage().getName());
+        return Collections.singletonList(MockConfigurationController.class.getPackage().getName());
     }
 }

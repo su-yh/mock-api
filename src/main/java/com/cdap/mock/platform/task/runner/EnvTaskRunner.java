@@ -5,6 +5,24 @@ import com.base.dds.datasource.hikari.HikariDataSourcePlus;
 import com.base.dds.datasource.properties.DynamicDataSourceProviderProperties;
 import com.base.web.constants.enums.BaseWebErrorCodeEnums;
 import com.base.web.exception.ExceptionUtil;
+import com.cdap.mock.component.UuidComponent;
+import com.cdap.mock.constants.DataSourceNames;
+import com.cdap.mock.constants.MockModeEnums;
+import com.cdap.mock.env.service.AdjustService;
+import com.cdap.mock.env.service.AdsAttributeService;
+import com.cdap.mock.env.service.AdvertiserService;
+import com.cdap.mock.env.service.ChannelService;
+import com.cdap.mock.env.service.ProjectService;
+import com.cdap.mock.env.service.RateService;
+import com.cdap.mock.env.service.RoiService;
+import com.cdap.mock.env.service.TbRechargeService;
+import com.cdap.mock.env.service.TbUserLoginService;
+import com.cdap.mock.env.service.TbUserService;
+import com.cdap.mock.env.service.TbWithdrawalService;
+import com.cdap.mock.event.EnvTaskFinishedEvent;
+import com.cdap.mock.job.MockDataTask;
+import com.cdap.mock.mp.processor.EnvDsProcessor;
+import com.cdap.mock.mq.produce.RabbitProduceComponent;
 import com.cdap.mock.platform.dao.cdapmysql.mapper.ChannelMapper;
 import com.cdap.mock.platform.dao.cdapmysql.mapper.CohortCalculationChannelCodeMapper;
 import com.cdap.mock.platform.dao.cdapmysql.mapper.CohortRoiCalculationConfMapper;
@@ -22,25 +40,8 @@ import com.cdap.mock.platform.dao.cdappgsql.mapper.AdjustAdMapper;
 import com.cdap.mock.platform.dao.cdappgsql.mapper.AdjustCostRecordMapper;
 import com.cdap.mock.platform.dao.cdappgsql.mapper.AdjustUserMapper;
 import com.cdap.mock.platform.dao.mgr.entity.EnvDatasourcePropertiesEntity;
-import com.cdap.mock.platform.dao.mgr.entity.EnvPropertiesEntity;
+import com.cdap.mock.platform.dao.mgr.entity.MockPropertiesEntity;
 import com.cdap.mock.platform.task.common.EnvLocalThread;
-import com.cdap.mock.component.UuidComponent;
-import com.cdap.mock.constants.DataSourceNames;
-import com.cdap.mock.constants.MockModeEnums;
-import com.cdap.mock.job.MockDataTask;
-import com.cdap.mock.mp.processor.EnvDsProcessor;
-import com.cdap.mock.mq.produce.RabbitProduceComponent;
-import com.cdap.mock.env.service.AdjustService;
-import com.cdap.mock.env.service.AdsAttributeService;
-import com.cdap.mock.env.service.AdvertiserService;
-import com.cdap.mock.env.service.ChannelService;
-import com.cdap.mock.env.service.ProjectService;
-import com.cdap.mock.env.service.RateService;
-import com.cdap.mock.env.service.RoiService;
-import com.cdap.mock.env.service.TbRechargeService;
-import com.cdap.mock.env.service.TbUserLoginService;
-import com.cdap.mock.env.service.TbUserService;
-import com.cdap.mock.env.service.TbWithdrawalService;
 import com.cdap.mock.util.CdapStopWatch;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -70,7 +71,7 @@ public class EnvTaskRunner extends Thread {
     private boolean initFlag = false;
 
     private final ApplicationContext context;
-    private final EnvPropertiesEntity envPropertiesEntity;
+    private final MockPropertiesEntity mockPropertiesEntity;
     private final EnvDatasourcePropertiesEntity cdsDataSource;
     private final EnvDatasourcePropertiesEntity pgDataSource;
 
@@ -116,7 +117,7 @@ public class EnvTaskRunner extends Thread {
                 cohortCalculationChannelCodeMapper, projectService, channelService);
         AdsAttributeService adsAttributeService = new AdsAttributeService(uuidComponent, adAdvertiserCampaignMapper,
                 adjustAdMapper, projectService, channelService);
-        AdvertiserService advertiserService = new AdvertiserService(context, adAdvertiserMapper, adjustCostRecordMapper,
+        AdvertiserService advertiserService = new AdvertiserService(adAdvertiserMapper, adjustCostRecordMapper,
                 uuidComponent, projectService, channelService, adsAttributeService);
         AdjustService adjustService = new AdjustService(adjustUserMapper, advertiserService);
 
@@ -124,8 +125,7 @@ public class EnvTaskRunner extends Thread {
                 tbWithdrawalService, adjustService, projectService, channelService, rateService, advertiserService,
                 roiService, adsAttributeService);
 
-
-        String env = envPropertiesEntity.getEnv();
+        String env = mockPropertiesEntity.getEnv();
         super.setName(env);
         initFlag = true;
     }
@@ -134,10 +134,10 @@ public class EnvTaskRunner extends Thread {
     public void run() {
         DynamicRoutingDataSource dynamicRoutingDataSource = context.getBean(DynamicRoutingDataSource.class);
 
-        final String env = envPropertiesEntity.getEnv();
+        final String env = mockPropertiesEntity.getEnv();
         log.info("start, env: {}", env);
         EnvDsProcessor.ENV.set(env);
-        EnvLocalThread.ENV_PROPERTIES_ENTITY_THREAD_LOCAL.set(envPropertiesEntity);
+        EnvLocalThread.ENV_PROPERTIES_ENTITY_THREAD_LOCAL.set(mockPropertiesEntity);
         String envFlinkCds = env + EnvDsProcessor.SEPARATOR + DataSourceNames.FLINK_CDS;
         String envFlinkPg = env + EnvDsProcessor.SEPARATOR + DataSourceNames.FLINK_PG_CDAP;
 
@@ -160,7 +160,7 @@ public class EnvTaskRunner extends Thread {
             dynamicRoutingDataSource.addDataSource(envFlinkCds, hikariCds);
             dynamicRoutingDataSource.addDataSource(envFlinkPg, hikariPg);
 
-            MockModeEnums mockMode = envPropertiesEntity.getMode();
+            MockModeEnums mockMode = mockPropertiesEntity.getMode();
 
             log.info("CURRENT DATA MOCK MODE: {}.", mockMode);
 
@@ -188,6 +188,8 @@ public class EnvTaskRunner extends Thread {
             EnvLocalThread.ENV_PROPERTIES_ENTITY_THREAD_LOCAL.remove();
 
             EnvDsProcessor.ENV.remove();
+
+            context.publishEvent(new EnvTaskFinishedEvent(env));
         }
     }
 
@@ -250,14 +252,12 @@ public class EnvTaskRunner extends Thread {
                             "##########################\n" +
                             "{}",
                     stopWatch.prettyPrint());
-
-//            context.close();
         }
     }
 
     public void doMockByDateRage(long intervalMillis) {
-        long timestampBegin = envPropertiesEntity.getTsBegin();
-        long timestampEnd = envPropertiesEntity.getTsEnd();
+        long timestampBegin = mockPropertiesEntity.getTsBegin();
+        long timestampEnd = mockPropertiesEntity.getTsEnd();
 
         for (long timestamp = timestampBegin; timestamp < timestampEnd; timestamp += intervalMillis) {
             mockDataTask.doDataMockTick(timestamp);

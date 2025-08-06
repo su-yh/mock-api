@@ -1,6 +1,8 @@
 package com.cdap.mock.env.service;
 
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
+import com.cdap.mock.component.UuidComponent;
+import com.cdap.mock.constants.DataMockConstants;
 import com.cdap.mock.platform.dao.cdapmysql.entity.ProjectEntity;
 import com.cdap.mock.platform.dao.cdapmysql.entity.SubChannelEntity;
 import com.cdap.mock.platform.dao.cdappgsql.entity.AdAdvertiserEntity;
@@ -8,9 +10,6 @@ import com.cdap.mock.platform.dao.cdappgsql.entity.AdjustAdEntity;
 import com.cdap.mock.platform.dao.cdappgsql.entity.AdjustCostRecordEntity;
 import com.cdap.mock.platform.dao.cdappgsql.mapper.AdAdvertiserMapper;
 import com.cdap.mock.platform.dao.cdappgsql.mapper.AdjustCostRecordMapper;
-import com.cdap.mock.component.UuidComponent;
-import com.cdap.mock.constants.DataMockConstants;
-import com.cdap.mock.event.AdvertiserCreatedEvent;
 import com.cdap.mock.vo.ProjectPlusEntity;
 import com.cdap.mock.vo.TickAttribute;
 import com.cdap.mock.vo.TickRuntime;
@@ -18,7 +17,6 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationContext;
 import org.springframework.lang.NonNull;
 
 import java.math.BigDecimal;
@@ -40,7 +38,6 @@ public class AdvertiserService {
     private Cache<String, List<AdjustAdEntity>> cacheDatesAds;
     private List<AdAdvertiserEntity> advertiserEntities;
 
-    private final ApplicationContext context;
     private final AdAdvertiserMapper adAdvertiserMapper;
     private final AdjustCostRecordMapper adjustCostRecordMapper;
 
@@ -49,20 +46,23 @@ public class AdvertiserService {
     private final ChannelService channelService;
     private final AdsAttributeService adsAttributeService;
 
+    /**
+     * 返回方法当前新建的投放方
+     */
     @DSTransactional
-    public synchronized void init() {
+    public synchronized List<AdAdvertiserEntity> init() {
         cacheDatesAds = Caffeine.newBuilder()
                 .expireAfterWrite(1, TimeUnit.DAYS).initialCapacity(4096).build();
 
         List<AdAdvertiserEntity> list = adAdvertiserMapper.selectList();
         if (list != null && !list.isEmpty()) {
-            return;
+            return null;
         }
 
         List<ProjectPlusEntity> projectEntities = projectService.projectEntityList();
         if (projectEntities == null || projectEntities.isEmpty()) {
             log.warn("no project init system advertiser failed.");
-            return;
+            return null;
         }
 
         List<AdAdvertiserEntity> advertiserList = new ArrayList<>();
@@ -108,10 +108,8 @@ public class AdvertiserService {
 
         adAdvertiserMapper.insertBatch(advertiserList);
 
-        AdvertiserCreatedEvent event = new AdvertiserCreatedEvent(advertiserList);
-        context.publishEvent(event);
-
         log.info("---------初始化 advertiser size: {} ---", advertiserList.size());
+        return advertiserList;
     }
 
     private AdAdvertiserEntity buildAdvertiserEntity(List<Long> projectIds) {

@@ -8,7 +8,7 @@ import com.cdap.mock.platform.dao.cdapmysql.entity.TbUserEntity;
 import com.cdap.mock.platform.dao.cdapmysql.entity.TbUserLoginEntity;
 import com.cdap.mock.platform.dao.cdapmysql.entity.TbWithdrawalEntity;
 import com.cdap.mock.platform.dao.cdappgsql.entity.AdAdvertiserEntity;
-import com.cdap.mock.platform.dao.mgr.entity.EnvPropertiesEntity;
+import com.cdap.mock.platform.dao.mgr.entity.MockPropertiesEntity;
 import com.cdap.mock.platform.task.common.EnvLocalThread;
 import com.cdap.mock.constants.MockModeEnums;
 import com.cdap.mock.mq.produce.RabbitProduceComponent;
@@ -79,10 +79,11 @@ public class MockDataTask {
         projectService.init();
         channelService.init();
         rateService.init();
-        advertiserService.init();
+        List<AdAdvertiserEntity> adAdvertiserEntities = advertiserService.init();
+        adsAttributeService.mockAdsAttribute(adAdvertiserEntities); // 新建的投放方，先调用此方法，原来的事件需要spring 容器
         adsAttributeService.init();
-        EnvPropertiesEntity envPropertiesEntity = EnvLocalThread.ENV_PROPERTIES_ENTITY_THREAD_LOCAL.get();
-        tbUserLoginService.init(envPropertiesEntity.getTsBegin());
+        MockPropertiesEntity mockPropertiesEntity = EnvLocalThread.ENV_PROPERTIES_ENTITY_THREAD_LOCAL.get();
+        tbUserLoginService.init(mockPropertiesEntity.getTsBegin());
         roiService.init();
 
         initTickAttributeList();
@@ -126,8 +127,8 @@ public class MockDataTask {
         stopWatch.stop();
 
         stopWatch.start("step_7-rmq");
-        EnvPropertiesEntity envPropertiesEntity = EnvLocalThread.ENV_PROPERTIES_ENTITY_THREAD_LOCAL.get();
-        if (envPropertiesEntity.getRmqEnabled()) {
+        MockPropertiesEntity mockPropertiesEntity = EnvLocalThread.ENV_PROPERTIES_ENTITY_THREAD_LOCAL.get();
+        if (mockPropertiesEntity.getRmqEnabled()) {
             rmqProduce.sendTbUserMessage(tbUserEntities);
             rmqProduce.sendTbUserLoginMessage(tbUserLoginEntities);
             rmqProduce.sendTbUserRechargeMessage(tbRechargeEntities);
@@ -149,7 +150,7 @@ public class MockDataTask {
             log.info("\n======= systemTime: {}, pnTime: {}, pn: {}\n{}", sysDateTimeFmt, pnDateTimeFmt, pn, stopWatch.prettyPrint());
         } else {
             // 执行性能问题的调试日志
-            if (envPropertiesEntity.getMode() == MockModeEnums.TIMER_JOB) {
+            if (mockPropertiesEntity.getMode() == MockModeEnums.TIMER_JOB) {
                 log.info("注册: {}，登录: {}, 充值: {}, 提现: {}",
                         tbUserEntities.size(), tbUserLoginEntities.size(), tbRechargeEntities.size(), tbWithdrawalEntities.size());
                 log.info("\n======= systemTime: {}, pnTime: {}, pn: {}\n{}", sysDateTimeFmt, pnDateTimeFmt, pn, stopWatch.prettyPrint());

@@ -20,7 +20,7 @@ import java.util.Date;
  */
 @Data
 @TableName(value = "mock_properties", autoResultMap = true)
-public class EnvPropertiesEntity {
+public class MockPropertiesEntity {
     @TableId(type = IdType.AUTO)
     @Null(groups = ValidationGroups.Req.Create.class)
     @NotNull(groups = ValidationGroups.Req.Update.class)

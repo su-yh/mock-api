@@ -138,7 +138,10 @@ public class AdsAttributeService {
         String campaignName = uuidComponent.uuidStr();
         String adGroupId = uuidComponent.uuidStr();
         String adId = uuidComponent.uuidStr();
-        String keyValue = String.format("%s_KEY_%s_%s_%s_%s", source, channel, campaignId, adGroupId, adId);
+        String pkg = uuidComponent.uuidStr();
+        // "pkg-${pkg}-channelid-${channelid}-source-${source}-campaign-${campaign}-adgroup-${adgroup}"
+        // String keyValue = String.format("%s_KEY_%s_%s_%s_%s", source, channel, campaignId, adGroupId, adId);
+        String keyValue = String.format("pkg-%s-channelid-%s-source-%s-campaign-%s-adgroup-%s", pkg, channel, source, campaignId, adGroupId);
 
         AdjustAdEntity adsAttribute = new AdjustAdEntity();
         adsAttribute.setChannel(channel);
@@ -148,6 +151,7 @@ public class AdsAttributeService {
         adsAttribute.setAdId(source + "_adId_" + adId);
         adsAttribute.setSource(source);
         adsAttribute.setKey(keyValue);
+        adsAttribute.setPkg(pkg);
         return adsAttribute;
     }
 

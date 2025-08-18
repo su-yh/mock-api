@@ -37,4 +37,13 @@ public class MockEnvConfigService {
     public void deleteById(Long id) {
         mockEnvConfigMapper.deleteById(id);
     }
+
+    public void statusSwitch(Long id, Boolean enabled) {
+        MockEnvConfigEntity updateEntity = new MockEnvConfigEntity();
+
+        updateEntity.setId(id);
+        updateEntity.setEnabled(enabled);
+
+        mockEnvConfigMapper.updateById(updateEntity);
+    }
 }

@@ -63,7 +63,14 @@ springdoc:
         - "com.eb.business.controller"
     - group: "env"
       paths-to-match:
-        - "/env/**"
+        - "/env/datasource/**"
+        - "/env/rabbitmq/**"
+      packages-to-scan:
+        - "com.cdap.mock.platform.controller"
+    - group: "platform"
+      paths-to-match:
+        - "/platform/env/**"
+        - "/platform/mock/**"
       packages-to-scan:
         - "com.cdap.mock.platform.controller"
 

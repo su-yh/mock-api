@@ -3,5 +3,5 @@ sys:
     user:
       captcha:
         two-factor-auth-enabled: false
-
+      token-seconds: 86400
 

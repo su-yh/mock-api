@@ -6,6 +6,7 @@ import com.cdap.mock.platform.dao.cdapmysql.entity.ChannelEntity;
 import com.cdap.mock.platform.dao.cdapmysql.entity.SubChannelEntity;
 import com.cdap.mock.platform.dao.cdappgsql.entity.AdAdvertiserCampaignEntity;
 import com.cdap.mock.platform.dao.cdappgsql.entity.AdAdvertiserEntity;
+import com.cdap.mock.platform.dao.cdappgsql.entity.AdKeywordsCampaignEntity;
 import com.cdap.mock.platform.dao.cdappgsql.entity.AdjustAdEntity;
 import com.cdap.mock.platform.dao.cdappgsql.mapper.AdAdvertiserCampaignMapper;
 import com.cdap.mock.platform.dao.cdappgsql.mapper.AdjustAdMapper;
@@ -14,6 +15,7 @@ import com.cdap.mock.vo.ProjectPlusEntity;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,6 +40,7 @@ public class AdsAttributeService {
     private final AdjustAdMapper adjustAdMapper;
     private final ProjectService projectService;
     private final ChannelService channelService;
+    private final AdKeywordsCampaignService adKeywordsCampaignService;
 
     public void mockAdsAttribute(List<AdAdvertiserEntity> entities) {
         if (entities == null || entities.isEmpty()) {
@@ -106,7 +109,49 @@ public class AdsAttributeService {
         log.info("init {} finished size: {}",
                 AdAdvertiserCampaignEntity.class.getSimpleName(), adAdvertiserCampaignEntities.size());
 
+        syncKeyWord(adsAttributeEntities);
+
         log.info("{}", stopWatch.prettyPrint());
+    }
+
+    private void syncKeyWord(List<AdjustAdEntity> adsAttributeEntities) {
+        if (adsAttributeEntities == null || adsAttributeEntities.isEmpty()) {
+            return;
+        }
+
+        List<AdKeywordsCampaignEntity> insertEntities = new ArrayList<>();
+
+        for (AdjustAdEntity adsAttributeEntity : adsAttributeEntities) {
+            String campaignName = adsAttributeEntity.getCampaignName();
+            String campaignId = adsAttributeEntity.getCampaignId();
+            String source = adsAttributeEntity.getSource();
+            String channel = adsAttributeEntity.getChannel();
+
+            String keyWord = extractKeyWord(random, campaignName);
+            if (!StringUtils.hasText(keyWord)) {
+                continue;
+            }
+            if (!StringUtils.hasText(campaignId)) {
+                continue;
+            }
+            if (!StringUtils.hasText(source)) {
+                continue;
+            }
+            if (!StringUtils.hasText(channel)) {
+                continue;
+            }
+
+            AdKeywordsCampaignEntity insertEntity = new AdKeywordsCampaignEntity();
+            insertEntity.setCampaignName(campaignName);
+            insertEntity.setKeyword(keyWord);
+            insertEntity.setCampaignId(campaignId);
+            insertEntity.setSource(source);
+            insertEntity.setChannel(channel);
+
+            insertEntities.add(insertEntity);
+        }
+
+        adKeywordsCampaignService.insertBatch(insertEntities);
     }
 
     public void init() {
@@ -160,6 +205,41 @@ public class AdsAttributeService {
         Keyed keyed = new Keyed();
         keyed.setAdvertiserId(advertiserId).setPn(pn).setChannel(channel);
         return keyedCampaignIds.get(keyed);
+    }
+
+
+    /**
+     * 从字符串中随机提取连续的3到8个字符
+     *
+     * @param campaignName 要提取字符的原始字符串
+     * @return 提取出的子字符串，如果原始字符串长度不足3则返回null
+     */
+    public static String extractKeyWord(Random random, String campaignName) {
+        // 检查输入字符串是否有效且长度至少为3
+        if (campaignName == null || campaignName.length() < 3) {
+            return null;
+        }
+
+        // 计算最大可能的起始索引，确保至少能提取3个字符
+        int maxStartIndex = campaignName.length() - 3;
+
+        // 随机生成起始索引
+        int startIndex = random.nextInt(maxStartIndex + 1);
+
+        // 计算剩余可用字符数
+        int remainingLength = campaignName.length() - startIndex;
+
+        // 确定最大可能的子串长度（不超过8且不超过剩余字符数）
+        int maxPossibleLength = Math.min(8, remainingLength);
+
+        // 随机生成3到maxPossibleLength之间的长度
+        int substringLength = 3 + random.nextInt(maxPossibleLength - 3 + 1);
+
+        // 计算结束索引
+        int endIndex = startIndex + substringLength;
+
+        // 提取并返回子串
+        return campaignName.substring(startIndex, endIndex);
     }
 
     @Data

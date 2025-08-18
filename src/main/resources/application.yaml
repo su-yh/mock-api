@@ -5,6 +5,7 @@ spring:
       - application-custom.yaml
       - application-datasource.yaml
       - application-flyway.yaml
+      - application-jackson.yaml
       - application-knife4j.yaml
       - application-log.yaml
       - application-message_source.yaml

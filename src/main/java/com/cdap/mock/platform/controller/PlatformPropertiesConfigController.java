@@ -7,6 +7,7 @@ import com.cdap.mock.platform.dao.mgr.entity.MockPropertiesEntity;
 import com.cdap.mock.platform.service.MockPropertiesConfigService;
 import com.web.sys.dto.base.IdBody;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -27,8 +28,11 @@ import javax.validation.groups.Default;
 @Validated
 @Slf4j
 public class PlatformPropertiesConfigController {
+    private static final String SWAGGER_TAG_PLATFORM_PROPERTIES = "Platform Properties";
+
     private final MockPropertiesConfigService mockPropertiesConfigService;
 
+    @Tag(name = SWAGGER_TAG_PLATFORM_PROPERTIES)
     @Operation(summary = "查询(分页)")
     @RequestMapping(value = "/listPage", method = RequestMethod.GET)
     public PageResult<MockPropertiesEntity> listPage(
@@ -36,6 +40,7 @@ public class PlatformPropertiesConfigController {
         return mockPropertiesConfigService.listPage(pageParam);
     }
 
+    @Tag(name = SWAGGER_TAG_PLATFORM_PROPERTIES)
     @Operation(summary = "新建")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public void create(
@@ -43,6 +48,7 @@ public class PlatformPropertiesConfigController {
         mockPropertiesConfigService.create(createEntity);
     }
 
+    @Tag(name = SWAGGER_TAG_PLATFORM_PROPERTIES)
     @Operation(summary = "编辑")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     public void updateById(
@@ -50,6 +56,7 @@ public class PlatformPropertiesConfigController {
         mockPropertiesConfigService.updateById(updateEntity);
     }
 
+    @Tag(name = SWAGGER_TAG_PLATFORM_PROPERTIES)
     @Operation(summary = "删除")
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
     public void deleteById(

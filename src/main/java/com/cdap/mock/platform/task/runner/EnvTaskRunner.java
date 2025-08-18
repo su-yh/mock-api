@@ -8,6 +8,7 @@ import com.base.web.exception.ExceptionUtil;
 import com.cdap.mock.component.UuidComponent;
 import com.cdap.mock.constants.DataSourceNames;
 import com.cdap.mock.constants.MockModeEnums;
+import com.cdap.mock.env.service.AdKeywordsCampaignService;
 import com.cdap.mock.env.service.AdjustService;
 import com.cdap.mock.env.service.AdsAttributeService;
 import com.cdap.mock.env.service.AdvertiserService;
@@ -36,6 +37,7 @@ import com.cdap.mock.platform.dao.cdapmysql.mapper.TbUserMapper;
 import com.cdap.mock.platform.dao.cdapmysql.mapper.TbWithdrawalMapper;
 import com.cdap.mock.platform.dao.cdappgsql.mapper.AdAdvertiserCampaignMapper;
 import com.cdap.mock.platform.dao.cdappgsql.mapper.AdAdvertiserMapper;
+import com.cdap.mock.platform.dao.cdappgsql.mapper.AdKeywordsCampaignMapper;
 import com.cdap.mock.platform.dao.cdappgsql.mapper.AdjustAdMapper;
 import com.cdap.mock.platform.dao.cdappgsql.mapper.AdjustCostRecordMapper;
 import com.cdap.mock.platform.dao.cdappgsql.mapper.AdjustUserMapper;
@@ -103,6 +105,7 @@ public class EnvTaskRunner extends Thread {
         TbUserLoginMapper tbUserLoginMapper = context.getBean(TbUserLoginMapper.class);
         TbRechargeMapper tbRechargeMapper = context.getBean(TbRechargeMapper.class);
         TbWithdrawalMapper tbWithdrawalMapper = context.getBean(TbWithdrawalMapper.class);
+        AdKeywordsCampaignMapper adKeywordsCampaignMapper = context.getBean(AdKeywordsCampaignMapper.class);
 
         // service 普通对象
         ProjectService projectService = new ProjectService(projectMapper);
@@ -111,12 +114,13 @@ public class EnvTaskRunner extends Thread {
         TbUserLoginService tbUserLoginService = new TbUserLoginService(tbUserLoginMapper, tbUserService, projectService, uuidComponent);
         TbRechargeService tbRechargeService = new TbRechargeService(tbRechargeMapper, uuidComponent, tbUserService, projectService, rateService);
         TbWithdrawalService tbWithdrawalService = new TbWithdrawalService(tbWithdrawalMapper, uuidComponent, tbUserService, projectService, rateService);
+        AdKeywordsCampaignService adKeywordsCampaignService = new AdKeywordsCampaignService(adKeywordsCampaignMapper);
 
         ChannelService channelService = new ChannelService(channelMapper, subChannelMapper, projectService);
         RoiService roiService = new RoiService(cohortRoiCalculationMapper, cohortRoiCalculationConfMapper,
                 cohortCalculationChannelCodeMapper, projectService, channelService);
         AdsAttributeService adsAttributeService = new AdsAttributeService(uuidComponent, adAdvertiserCampaignMapper,
-                adjustAdMapper, projectService, channelService);
+                adjustAdMapper, projectService, channelService, adKeywordsCampaignService);
         AdvertiserService advertiserService = new AdvertiserService(adAdvertiserMapper, adjustCostRecordMapper,
                 uuidComponent, projectService, channelService, adsAttributeService);
         AdjustService adjustService = new AdjustService(adjustUserMapper, advertiserService);
@@ -140,9 +144,6 @@ public class EnvTaskRunner extends Thread {
         EnvLocalThread.ENV_PROPERTIES_ENTITY_THREAD_LOCAL.set(mockPropertiesEntity);
         String envFlinkCds = env + EnvDsProcessor.SEPARATOR + DataSourceNames.FLINK_CDS;
         String envFlinkPg = env + EnvDsProcessor.SEPARATOR + DataSourceNames.FLINK_PG_CDAP;
-
-//        EnvLocalThread.threadLocalDataSourceCds.set(envFlinkCds);
-//        EnvLocalThread.threadLocalDataSourcePg.set(envFlinkPg);
 
         try (HikariDataSourcePlus hikariCds = new HikariDataSourcePlus();
              HikariDataSourcePlus hikariPg = new HikariDataSourcePlus()) {

@@ -18,7 +18,7 @@ public interface EnvDatasourcePropertiesMapper extends BaseMapperX<EnvDatasource
     default EnvDatasourcePropertiesEntity selectByEnvName(String env, DataSourceEnums name) {
         LambdaQueryWrapperX<EnvDatasourcePropertiesEntity> queryWrapperX = build();
         queryWrapperX.eq(EnvDatasourcePropertiesEntity::getEnv, env);
-        queryWrapperX.eq(EnvDatasourcePropertiesEntity::getName, name);
+        queryWrapperX.eq(EnvDatasourcePropertiesEntity::getDataSourceName, name);
 
         return selectOne(queryWrapperX);
     }

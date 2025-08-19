@@ -1,6 +1,7 @@
 package com.cdap.mock.constants;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 /**
@@ -14,6 +15,7 @@ public enum DataSourceEnums {
     ;
 
     @EnumValue
+    @JsonValue
     private final String code;
 
     DataSourceEnums(String code) {

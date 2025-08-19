@@ -1,6 +1,7 @@
 package com.cdap.mock.platform.dao.mgr.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.cdap.mock.constants.DataSourceEnums;
@@ -24,7 +25,8 @@ public class EnvDatasourcePropertiesEntity {
     private String env;
 
     @Schema(description = "对应枚举：DataSourceEnums")
-    private DataSourceEnums name;
+    @TableField("name")
+    private DataSourceEnums dataSourceName;
 
     @Schema(description = "JDBC连接地址")
     private String jdbcUrl;

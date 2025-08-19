@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @author suyh
  * @since 2025-08-05
@@ -20,6 +22,10 @@ public class MockEnvConfigService {
 
     public MockEnvConfigEntity selectEntityByEnv(String env) {
         return mockEnvConfigMapper.selectEntityByEnv(env);
+    }
+
+    public List<MockEnvConfigEntity> listAll() {
+        return mockEnvConfigMapper.selectList();
     }
 
     public PageResult<MockEnvConfigEntity> listPage(PageParam pageParam) {

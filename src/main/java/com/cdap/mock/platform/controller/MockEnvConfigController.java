@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.groups.Default;
+import java.util.List;
 
 /**
  * @author suyh
@@ -39,6 +40,13 @@ public class MockEnvConfigController {
     public PageResult<MockEnvConfigEntity> listPage(
             PageParam pageParam) {
         return mockEnvConfigService.listPage(pageParam);
+    }
+
+    @Tag(name = SWAGGER_TAG_PLATFORM_ENV)
+    @Operation(summary = "查询(所有)")
+    @RequestMapping(value = "/listAll", method = RequestMethod.GET)
+    public List<MockEnvConfigEntity> listAll() {
+        return mockEnvConfigService.listAll();
     }
 
     @Tag(name = SWAGGER_TAG_PLATFORM_ENV)

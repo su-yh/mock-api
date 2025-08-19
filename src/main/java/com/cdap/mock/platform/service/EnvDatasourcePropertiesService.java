@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 /**
  * @author suyh
  * @since 2025-08-06
@@ -37,5 +39,17 @@ public class EnvDatasourcePropertiesService {
 
     public void deleteById(Long id) {
         envDatasourcePropertiesMapper.deleteById(id);
+    }
+
+    public void switchFlywayEnable(Long id, boolean enabled) {
+        if (id == null) {
+            return;
+        }
+
+        EnvDatasourcePropertiesEntity updateEntity = new EnvDatasourcePropertiesEntity();
+        updateEntity.setId(id).setFlywayEnabled(enabled);
+        updateEntity.setUpdated(new Date());
+
+        envDatasourcePropertiesMapper.updateById(updateEntity);
     }
 }

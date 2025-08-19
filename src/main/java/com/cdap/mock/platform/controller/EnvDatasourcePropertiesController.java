@@ -4,6 +4,7 @@ import com.base.mp.mybatis.PageParam;
 import com.base.mp.mybatis.PageResult;
 import com.base.web.validation.groups.ValidationGroups;
 import com.cdap.mock.platform.dao.mgr.entity.EnvDatasourcePropertiesEntity;
+import com.cdap.mock.platform.dto.StatusSwitchBody;
 import com.cdap.mock.platform.service.EnvDatasourcePropertiesService;
 import com.web.sys.dto.base.IdBody;
 import io.swagger.v3.oas.annotations.Operation;
@@ -62,5 +63,13 @@ public class EnvDatasourcePropertiesController {
     public void deleteById(
             @RequestBody @Validated IdBody idBody) {
         envDatasourcePropertiesService.deleteById(idBody.getId());
+    }
+
+    @Tag(name = SWAGGER_TAG_DATASOURCE)
+    @Operation(summary = "启用/禁用flyway")
+    @RequestMapping(value = "/switchFlywayEnable", method = RequestMethod.POST)
+    public void switchFlywayEnable(
+            @RequestBody @Validated StatusSwitchBody body) {
+        envDatasourcePropertiesService.switchFlywayEnable(body.getId(), body.getEnabled());
     }
 }

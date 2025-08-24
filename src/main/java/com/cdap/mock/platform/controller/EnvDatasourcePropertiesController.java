@@ -2,10 +2,14 @@ package com.cdap.mock.platform.controller;
 
 import com.base.mp.mybatis.PageParam;
 import com.base.mp.mybatis.PageResult;
+import com.base.web.exception.ExceptionUtil;
 import com.base.web.validation.groups.ValidationGroups;
+import com.cdap.mock.constants.DataSourceEnums;
+import com.cdap.mock.constants.DataSourceNames;
 import com.cdap.mock.platform.dao.mgr.entity.EnvDatasourcePropertiesEntity;
 import com.cdap.mock.platform.dto.StatusSwitchBody;
 import com.cdap.mock.platform.service.EnvDatasourcePropertiesService;
+import com.web.sys.constants.enums.SysWebErrorCodeEnums;
 import com.web.sys.dto.base.IdBody;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,6 +19,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.groups.Default;
@@ -39,6 +44,28 @@ public class EnvDatasourcePropertiesController {
     public PageResult<EnvDatasourcePropertiesEntity> listPage(
             PageParam pageParam) {
         return envDatasourcePropertiesService.listPage(pageParam);
+    }
+
+    @Tag(name = SWAGGER_TAG_DATASOURCE)
+    @Operation(summary = "查询实例")
+    @RequestMapping(value = "/queryDataSourceByEnv", method = RequestMethod.GET)
+    public EnvDatasourcePropertiesEntity queryDataSourceByEnv(
+            @RequestParam String env, @RequestParam String dataSourceName) {
+        DataSourceEnums ds = null;
+        switch (dataSourceName) {
+            case DataSourceNames.FLINK_CDS:
+                ds = DataSourceEnums.FLINK_CDS;
+                break;
+            case DataSourceNames.FLINK_PG_CDAP:
+                ds = DataSourceEnums.FLINK_PG_CDAP;
+                break;
+            default:
+                break;
+        }
+        if (ds == null) {
+            throw ExceptionUtil.business(SysWebErrorCodeEnums.PARAMETER_ERROR_PARAM, "dataSourceName: " + dataSourceName);
+        }
+        return envDatasourcePropertiesService.selectByEnvName(env, ds);
     }
 
     @Tag(name = SWAGGER_TAG_DATASOURCE)

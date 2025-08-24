@@ -14,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.groups.Default;
@@ -38,6 +39,14 @@ public class PlatformPropertiesConfigController {
     public PageResult<MockPropertiesEntity> listPage(
             PageParam pageParam) {
         return mockPropertiesConfigService.listPage(pageParam);
+    }
+
+    @Tag(name = SWAGGER_TAG_PLATFORM_PROPERTIES)
+    @Operation(summary = "查询(by env)")
+    @RequestMapping(value = "/queryPlatformByEnv", method = RequestMethod.GET)
+    public MockPropertiesEntity selectEntityByEnv(
+            @RequestParam String env) {
+        return mockPropertiesConfigService.selectEntityByEnv(env);
     }
 
     @Tag(name = SWAGGER_TAG_PLATFORM_PROPERTIES)

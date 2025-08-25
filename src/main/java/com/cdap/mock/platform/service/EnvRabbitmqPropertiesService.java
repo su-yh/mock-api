@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 /**
  * @author suyh
  * @since 2025-08-06
@@ -32,5 +34,22 @@ public class EnvRabbitmqPropertiesService {
 
     public void deleteById(Long id) {
         envRabbitmqPropertiesMapper.deleteById(id);
+    }
+
+    public EnvRabbitmqPropertiesEntity queryEntityByEnv(String env) {
+        return envRabbitmqPropertiesMapper.queryEntityByEnv(env);
+    }
+
+    public void switchEnableDisable(Long id, Boolean enabled) {
+        if (id == null) {
+            log.warn("update entity but id is null");
+            return;
+        }
+
+        EnvRabbitmqPropertiesEntity updateEntity = new EnvRabbitmqPropertiesEntity();
+        updateEntity.setId(id);
+        updateEntity.setEnabled(enabled);
+        updateEntity.setUpdated(new Date());
+        envRabbitmqPropertiesMapper.updateById(updateEntity);
     }
 }

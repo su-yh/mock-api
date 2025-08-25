@@ -14,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.groups.Default;
@@ -40,6 +41,14 @@ public class EnvRabbitmqPropertiesController {
     }
 
     @Tag(name = SWAGGER_TAG_RABBITMQ)
+    @Operation(summary = "查询")
+    @RequestMapping(value = "/queryEntityByEnv", method = RequestMethod.GET)
+    public EnvRabbitmqPropertiesEntity queryEntityByEnv(
+            @RequestParam String env) {
+        return envRabbitmqPropertiesService.queryEntityByEnv(env);
+    }
+
+    @Tag(name = SWAGGER_TAG_RABBITMQ)
     @Operation(summary = "新建")
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public void create(
@@ -61,5 +70,14 @@ public class EnvRabbitmqPropertiesController {
     public void deleteById(
             @RequestBody @Validated IdBody idBody) {
         envRabbitmqPropertiesService.deleteById(idBody.getId());
+    }
+
+    @Tag(name = SWAGGER_TAG_RABBITMQ)
+    @Operation(summary = "切换启用/禁用状态")
+    @RequestMapping(value = "/switchEnableDisable", method = RequestMethod.POST)
+    public void switchEnableDisable(
+            @RequestBody Boolean enabled,
+            @RequestBody @Validated IdBody idBody) {
+        envRabbitmqPropertiesService.switchEnableDisable(idBody.getId(), enabled);
     }
 }

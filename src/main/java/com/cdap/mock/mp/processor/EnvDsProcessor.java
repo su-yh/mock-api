@@ -29,6 +29,8 @@ public class EnvDsProcessor extends DsProcessor {
         return key.startsWith(DYNAMIC_PREFIX);
     }
 
+    // 返回最终实际的name，mybatis plus 将使用该name 进行数据源的切换。
+    // 例：原来直接使用 @DS("master") 时，现在要达到同样的效果，则这里最终解析完的返回值就应该是 "master"。
     @Override
     public String doDetermineDatasource(MethodInvocation invocation, String key) {
         String dsName = key.substring(DYNAMIC_PREFIX.length());

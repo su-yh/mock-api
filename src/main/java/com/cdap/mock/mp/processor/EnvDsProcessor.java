@@ -18,17 +18,23 @@ public class EnvDsProcessor extends DsProcessor {
 
     /**
      * 每个线程都需要自行进行初始化一个字符串的env。
-     * 另外数据源的名称需要有固定格式格式：{@link ENV} + {@link #SEPARATOR} + dsName
+     * 另外数据源的名称需要有固定格式格式：ENV + {@link #SEPARATOR} + dsName
      * 而在使用注解的时候则为： @DS({@link #DYNAMIC_PREFIX} + dsName)
      * 这两个后缀
      */
     public static final ThreadLocal<String> ENV = new ThreadLocal<>();
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean matches(String key) {
         return key.startsWith(DYNAMIC_PREFIX);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     // 返回最终实际的name，mybatis plus 将使用该name 进行数据源的切换。
     // 例：原来直接使用 @DS("master") 时，现在要达到同样的效果，则这里最终解析完的返回值就应该是 "master"。
     @Override

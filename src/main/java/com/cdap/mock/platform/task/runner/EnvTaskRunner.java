@@ -77,6 +77,9 @@ public class EnvTaskRunner extends Thread {
     private final EnvDatasourcePropertiesEntity cdsDataSource;
     private final EnvDatasourcePropertiesEntity pgDataSource;
 
+    private final IdGenerator idGenerator = new IdGenerator();
+    private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+
     // 普通对象
     private RabbitProduceComponent rmqProduce;  // TODO: suyh - 这个还没有处理。
 
@@ -87,9 +90,10 @@ public class EnvTaskRunner extends Thread {
             return;
         }
 
-        IdGenerator idGenerator = new IdGenerator();
+        // 初始化定时任务调度执行器
+        scheduledExecutorService.scheduleWithFixedDelay(idGenerator::resetRelativeMs, 11, 11, TimeUnit.SECONDS);
 
-        // spring bean 对象
+        // spring bean 对象是可以共
         ProjectMapper projectMapper = context.getBean(ProjectMapper.class);
         RateMapper rateMapper = context.getBean(RateMapper.class);
         AdjustUserMapper adjustUserMapper = context.getBean(AdjustUserMapper.class);
@@ -192,6 +196,40 @@ public class EnvTaskRunner extends Thread {
             EnvDsProcessor.ENV.remove();
 
             context.publishEvent(new EnvTaskFinishedEvent(env));
+
+            // 释放定时调度任务执行器
+            releaseExecutor();
+        }
+    }
+
+    private void releaseExecutor() {
+        // 步骤1：拒绝接收新的任务
+        scheduledExecutorService.shutdown();
+
+        // 步骤2：等待任务完成（设置超时时间，避免无限阻塞）
+        boolean isTerminated;
+        try {
+            // 等待30秒：可根据业务调整（若任务执行时间较长，可适当延长）
+            isTerminated = scheduledExecutorService.awaitTermination(30, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            // 若等待被中断，主动中断线程池的任务
+            Thread.currentThread().interrupt(); // 恢复中断状态，避免影响其他逻辑
+            isTerminated = false;
+            log.warn("Await termination of executor was interrupted", e);
+        }
+
+        // 步骤3：若超时未完成，强制终止所有任务（兜底策略）
+        if (!isTerminated) {
+            log.warn("Executor did not terminate in 30 seconds, forcing shutdown...");
+            scheduledExecutorService.shutdownNow(); // 强制中断正在执行的任务，清空队列
+            // 再次等待强制终止完成
+            try {
+                if (!scheduledExecutorService.awaitTermination(10, TimeUnit.SECONDS)) {
+                    log.error("Executor still not terminated after force shutdown");
+                }
+            } catch (InterruptedException e) {
+                log.warn("Executor still not terminated after force shutdown.", e);
+            }
         }
     }
 

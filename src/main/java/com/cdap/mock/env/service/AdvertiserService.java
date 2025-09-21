@@ -1,7 +1,6 @@
 package com.cdap.mock.env.service;
 
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
-import com.cdap.mock.component.UuidComponent;
 import com.cdap.mock.constants.DataMockConstants;
 import com.cdap.mock.platform.dao.cdapmysql.entity.ProjectEntity;
 import com.cdap.mock.platform.dao.cdapmysql.entity.SubChannelEntity;
@@ -10,6 +9,7 @@ import com.cdap.mock.platform.dao.cdappgsql.entity.AdjustAdEntity;
 import com.cdap.mock.platform.dao.cdappgsql.entity.AdjustCostRecordEntity;
 import com.cdap.mock.platform.dao.cdappgsql.mapper.AdAdvertiserMapper;
 import com.cdap.mock.platform.dao.cdappgsql.mapper.AdjustCostRecordMapper;
+import com.cdap.mock.util.IdGenerator;
 import com.cdap.mock.vo.ProjectPlusEntity;
 import com.cdap.mock.vo.TickAttribute;
 import com.cdap.mock.vo.TickRuntime;
@@ -41,7 +41,7 @@ public class AdvertiserService {
     private final AdAdvertiserMapper adAdvertiserMapper;
     private final AdjustCostRecordMapper adjustCostRecordMapper;
 
-    private final UuidComponent uuidComponent;
+    private final IdGenerator idGenerator;
     private final ProjectService projectService;
     private final ChannelService channelService;
     private final AdsAttributeService adsAttributeService;
@@ -113,7 +113,7 @@ public class AdvertiserService {
     }
 
     private AdAdvertiserEntity buildAdvertiserEntity(List<Long> projectIds) {
-        String advertiser = uuidComponent.uuidStr();
+        String advertiser = idGenerator.nextUuid();
         AdAdvertiserEntity advertiserEntity = new AdAdvertiserEntity();
         advertiserEntity.setName("advertiserName_" + advertiser);
         advertiserEntity.setSysUserId(-1L);

@@ -1,13 +1,13 @@
 package com.cdap.mock.env.service;
 
+import com.cdap.mock.constants.DataMockConstants;
+import com.cdap.mock.constants.MockModeEnums;
 import com.cdap.mock.platform.dao.cdapmysql.entity.TbUserEntity;
 import com.cdap.mock.platform.dao.cdapmysql.entity.TbUserLoginEntity;
 import com.cdap.mock.platform.dao.cdapmysql.mapper.TbUserLoginMapper;
 import com.cdap.mock.platform.task.common.EnvLocalThread;
-import com.cdap.mock.component.UuidComponent;
-import com.cdap.mock.constants.DataMockConstants;
-import com.cdap.mock.constants.MockModeEnums;
 import com.cdap.mock.util.CdapDateUtils;
+import com.cdap.mock.util.IdGenerator;
 import com.cdap.mock.vo.ProjectPlusEntity;
 import com.cdap.mock.vo.TickRuntime;
 import com.github.benmanes.caffeine.cache.Cache;
@@ -40,7 +40,7 @@ public class TbUserLoginService extends AbstractHistoryRepeatService {
 
     private final TbUserService tbUserService;
     private final ProjectService projectService;
-    private final UuidComponent uuidComponent;
+    private final IdGenerator idGenerator;
 
     @NonNull
     public List<TbUserLoginEntity> mockTbUserLoginList(TickRuntime tickRuntime) {
@@ -112,7 +112,7 @@ public class TbUserLoginService extends AbstractHistoryRepeatService {
             if (rnd < 5) {
                 int indexTmp = random.nextInt(tbUserEntities.size());
                 TbUserEntity tbUserEntity = tbUserEntities.get(indexTmp);
-                String gaid = rnd == 0 ? DataMockConstants.DEFAULT_GAID : "gaid_" + uuidComponent.uuidStr();
+                String gaid = rnd == 0 ? DataMockConstants.DEFAULT_GAID : "gaid_" + idGenerator.nextUuid();
                 tbUserEntity.setGaid(gaid);
             }
         }

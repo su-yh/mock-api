@@ -1,6 +1,5 @@
 package com.cdap.mock.env.service;
 
-import com.cdap.mock.component.UuidComponent;
 import com.cdap.mock.constants.CommonConstants;
 import com.cdap.mock.platform.dao.cdapmysql.entity.ChannelEntity;
 import com.cdap.mock.platform.dao.cdapmysql.entity.SubChannelEntity;
@@ -11,6 +10,7 @@ import com.cdap.mock.platform.dao.cdappgsql.entity.AdjustAdEntity;
 import com.cdap.mock.platform.dao.cdappgsql.mapper.AdAdvertiserCampaignMapper;
 import com.cdap.mock.platform.dao.cdappgsql.mapper.AdjustAdMapper;
 import com.cdap.mock.util.CdapStopWatch;
+import com.cdap.mock.util.IdGenerator;
 import com.cdap.mock.vo.ProjectPlusEntity;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +35,7 @@ public class AdsAttributeService {
     // 投放方相关的组合，所对应的全部广告归因属性列表
     private final Map<Keyed, List<AdjustAdEntity>> keyedCampaignIds = new HashMap<>();
 
-    private final UuidComponent uuidComponent;
+    private final IdGenerator idGenerator;
     private final AdAdvertiserCampaignMapper adAdvertiserCampaignMapper;
     private final AdjustAdMapper adjustAdMapper;
     private final ProjectService projectService;
@@ -179,11 +179,11 @@ public class AdsAttributeService {
             source = CommonConstants.FB;
         }
 
-        String campaignId = uuidComponent.uuidStr();
-        String campaignName = uuidComponent.uuidStr();
-        String adGroupId = uuidComponent.uuidStr();
-        String adId = uuidComponent.uuidStr();
-        String pkg = uuidComponent.uuidStr();
+        String campaignId = idGenerator.nextUuid();
+        String campaignName = idGenerator.nextUuid();
+        String adGroupId = idGenerator.nextUuid();
+        String adId = idGenerator.nextUuid();
+        String pkg = idGenerator.nextUuid();
         // "pkg-${pkg}-channelid-${channelid}-source-${source}-campaign-${campaign}-adgroup-${adgroup}"
         // String keyValue = String.format("%s_KEY_%s_%s_%s_%s", source, channel, campaignId, adGroupId, adId);
         String keyValue = String.format("pkg-%s-channelid-%s-source-%s-campaign-%s-adgroup-%s", pkg, channel, source, campaignId, adGroupId);

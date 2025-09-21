@@ -4,9 +4,9 @@ import com.cdap.mock.platform.dao.cdapmysql.entity.TbUserEntity;
 import com.cdap.mock.platform.dao.cdapmysql.entity.TbWithdrawalEntity;
 import com.cdap.mock.platform.dao.cdapmysql.mapper.TbWithdrawalMapper;
 import com.cdap.mock.platform.task.common.EnvLocalThread;
-import com.cdap.mock.component.UuidComponent;
 import com.cdap.mock.constants.DataMockConstants;
 import com.cdap.mock.util.CdapDateUtils;
+import com.cdap.mock.util.IdGenerator;
 import com.cdap.mock.vo.TickRuntime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ import java.util.List;
 @Slf4j
 public class TbWithdrawalService extends AbstractHistoryRepeatService {
     private final TbWithdrawalMapper tbWithdrawalMapper;
-    private final UuidComponent uuidComponent;
+    private final IdGenerator idGenerator;
 
     private final TbUserService tbUserService;
     private final ProjectService projectService;
@@ -62,7 +62,7 @@ public class TbWithdrawalService extends AbstractHistoryRepeatService {
             if (rnd < 5) {
                 int indexTmp = random.nextInt(tbUserEntities.size());
                 TbUserEntity tbUserEntity = tbUserEntities.get(indexTmp);
-                String gaid = rnd == 0 ? DataMockConstants.DEFAULT_GAID : "gaid_" + uuidComponent.uuidStr();
+                String gaid = rnd == 0 ? DataMockConstants.DEFAULT_GAID : "gaid_" + idGenerator.nextUuid();
                 tbUserEntity.setGaid(gaid);
             }
         }
@@ -142,7 +142,7 @@ public class TbWithdrawalService extends AbstractHistoryRepeatService {
         tbUserWithdrawal.setLoginChannel(null);
         tbUserWithdrawal.setRegisterChannel(tbUser.getChannel());
 
-        String orderId = uuidComponent.uuidStr();
+        String orderId = idGenerator.nextUuid();
         tbUserWithdrawal.setOrder("withdrawal_" + orderId);
 
         ZoneId zoneId = projectService.obtainEntityByPn(tbUser.getPn()).getZoneOffset();

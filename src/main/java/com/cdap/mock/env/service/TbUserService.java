@@ -1,13 +1,13 @@
 package com.cdap.mock.env.service;
 
+import com.cdap.mock.constants.DataMockConstants;
 import com.cdap.mock.platform.dao.cdapmysql.entity.ProjectEntity;
 import com.cdap.mock.platform.dao.cdapmysql.entity.SubChannelEntity;
 import com.cdap.mock.platform.dao.cdapmysql.entity.TbUserEntity;
 import com.cdap.mock.platform.dao.cdapmysql.mapper.TbUserMapper;
 import com.cdap.mock.platform.task.common.EnvLocalThread;
-import com.cdap.mock.component.UuidComponent;
-import com.cdap.mock.constants.DataMockConstants;
 import com.cdap.mock.util.CdapDateUtils;
+import com.cdap.mock.util.IdGenerator;
 import com.cdap.mock.vo.TickRuntime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,7 @@ import java.util.Set;
 public class TbUserService {
     private final Random random = new Random();
 
-    private final UuidComponent uuidComponent;
+    private final IdGenerator idGenerator;
 
     private final TbUserMapper tbUserMapper;
 
@@ -124,8 +124,8 @@ public class TbUserService {
         String channel = subChannel.getChannelCode();
 
         // 1.=====注册用户 tab_user  `uid`, `pn`  unique
-        String gaid = "gaid_" + uuidComponent.uuidStr();
-        String uid = "uid_" + uuidComponent.uuidStr();
+        String gaid = "gaid_" + idGenerator.nextUuid();
+        String uid = "uid_" + idGenerator.nextUuid();
         TbUserEntity tbUser = new TbUserEntity();
         tbUser.setId(null);
         tbUser.setUid(uid);

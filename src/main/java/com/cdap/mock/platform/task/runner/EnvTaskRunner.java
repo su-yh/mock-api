@@ -5,7 +5,6 @@ import com.base.dds.datasource.hikari.HikariDataSourcePlus;
 import com.base.dds.datasource.properties.DynamicDataSourceProviderProperties;
 import com.base.web.constants.enums.BaseWebErrorCodeEnums;
 import com.base.web.exception.ExceptionUtil;
-import com.cdap.mock.component.UuidComponent;
 import com.cdap.mock.constants.DataSourceNames;
 import com.cdap.mock.constants.MockModeEnums;
 import com.cdap.mock.env.service.AdKeywordsCampaignService;
@@ -45,6 +44,7 @@ import com.cdap.mock.platform.dao.mgr.entity.EnvDatasourcePropertiesEntity;
 import com.cdap.mock.platform.dao.mgr.entity.MockPropertiesEntity;
 import com.cdap.mock.platform.task.common.EnvLocalThread;
 import com.cdap.mock.util.CdapStopWatch;
+import com.cdap.mock.util.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.flyway.FlywayProperties;
@@ -87,8 +87,9 @@ public class EnvTaskRunner extends Thread {
             return;
         }
 
+        IdGenerator idGenerator = new IdGenerator();
+
         // spring bean 对象
-        UuidComponent uuidComponent = context.getBean(UuidComponent.class);
         ProjectMapper projectMapper = context.getBean(ProjectMapper.class);
         RateMapper rateMapper = context.getBean(RateMapper.class);
         AdjustUserMapper adjustUserMapper = context.getBean(AdjustUserMapper.class);
@@ -110,19 +111,19 @@ public class EnvTaskRunner extends Thread {
         // service 普通对象
         ProjectService projectService = new ProjectService(projectMapper);
         RateService rateService = new RateService(rateMapper, projectService);
-        TbUserService tbUserService = new TbUserService(uuidComponent, tbUserMapper);
-        TbUserLoginService tbUserLoginService = new TbUserLoginService(tbUserLoginMapper, tbUserService, projectService, uuidComponent);
-        TbRechargeService tbRechargeService = new TbRechargeService(tbRechargeMapper, uuidComponent, tbUserService, projectService, rateService);
-        TbWithdrawalService tbWithdrawalService = new TbWithdrawalService(tbWithdrawalMapper, uuidComponent, tbUserService, projectService, rateService);
+        TbUserService tbUserService = new TbUserService(idGenerator, tbUserMapper);
+        TbUserLoginService tbUserLoginService = new TbUserLoginService(tbUserLoginMapper, tbUserService, projectService, idGenerator);
+        TbRechargeService tbRechargeService = new TbRechargeService(tbRechargeMapper, idGenerator, tbUserService, projectService, rateService);
+        TbWithdrawalService tbWithdrawalService = new TbWithdrawalService(tbWithdrawalMapper, idGenerator, tbUserService, projectService, rateService);
         AdKeywordsCampaignService adKeywordsCampaignService = new AdKeywordsCampaignService(adKeywordsCampaignMapper);
 
         ChannelService channelService = new ChannelService(channelMapper, subChannelMapper, projectService);
         RoiService roiService = new RoiService(cohortRoiCalculationMapper, cohortRoiCalculationConfMapper,
                 cohortCalculationChannelCodeMapper, projectService, channelService);
-        AdsAttributeService adsAttributeService = new AdsAttributeService(uuidComponent, adAdvertiserCampaignMapper,
+        AdsAttributeService adsAttributeService = new AdsAttributeService(idGenerator, adAdvertiserCampaignMapper,
                 adjustAdMapper, projectService, channelService, adKeywordsCampaignService);
         AdvertiserService advertiserService = new AdvertiserService(adAdvertiserMapper, adjustCostRecordMapper,
-                uuidComponent, projectService, channelService, adsAttributeService);
+                idGenerator, projectService, channelService, adsAttributeService);
         AdjustService adjustService = new AdjustService(adjustUserMapper, advertiserService);
 
         mockDataTask = new MockDataTask(rmqProduce, tbUserService, tbUserLoginService, tbRechargeService,

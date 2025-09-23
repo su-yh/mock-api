@@ -258,6 +258,7 @@ public class EnvTaskRunner extends Thread {
 
     @Override
     public synchronized void start() {
+        // 只能执行一次。
         if (!initFlag) {
             log.error("Uninitialized, unable to run.");
             throw ExceptionUtil.business(BaseWebErrorCodeEnums.SERVICE_ERROR);

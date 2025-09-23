@@ -13,6 +13,7 @@ import com.cdap.mock.env.service.TbRechargeService;
 import com.cdap.mock.env.service.TbUserLoginService;
 import com.cdap.mock.env.service.TbUserService;
 import com.cdap.mock.env.service.TbWithdrawalService;
+import com.cdap.mock.mp.processor.EnvDsProcessor;
 import com.cdap.mock.mq.produce.RabbitProduceComponent;
 import com.cdap.mock.platform.dao.cdapmysql.entity.ChannelEntity;
 import com.cdap.mock.platform.dao.cdapmysql.entity.SubChannelEntity;
@@ -43,7 +44,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-//@Component
 @RequiredArgsConstructor
 @Slf4j
 public class MockDataTask {
@@ -145,10 +145,11 @@ public class MockDataTask {
         String pnDateTimeFmt = pnDateTime.format(formatter);
         String sysDateTimeFmt = sysDateTime.format(formatter);
 
+        String env = EnvDsProcessor.ENV.get();
         if (true) {
             log.info("注册: {}，登录: {}, 充值: {}, 提现: {}",
                     tbUserEntities.size(), tbUserLoginEntities.size(), tbRechargeEntities.size(), tbWithdrawalEntities.size());
-            log.info("\n======= systemTime: {}, pnTime: {}, pn: {}\n{}", sysDateTimeFmt, pnDateTimeFmt, pn, stopWatch.prettyPrint());
+            log.info("\n======= env: {}, systemTime: {}, pnTime: {}, pn: {}\n{}", env, sysDateTimeFmt, pnDateTimeFmt, pn, stopWatch.prettyPrint());
         } else {
             // 执行性能问题的调试日志
             if (mockPropertiesEntity.getMode() == MockModeEnums.TIMER_JOB) {

@@ -98,6 +98,13 @@ public class DataMockTaskService {
     @EventListener(ContextClosedEvent.class)
     public void onContextClosed(ContextClosedEvent event) {
         log.info("收到停机信号");
+
+        releaseExecutor();
+
+        releaseEnvMicroEcosystemMp();
+    }
+
+    private void releaseEnvMicroEcosystemMp() {
         if (envMicroEcosystemMap.isEmpty()) {
             return;
         }
@@ -105,9 +112,9 @@ public class DataMockTaskService {
         envMicroEcosystemMap.forEach((env, runner) -> runner.stop());
 
         log.info("等待所有线程停机");
-        AtomicBoolean allStopped = new AtomicBoolean(false);
         // 等30 秒，所有的线程都停止
         for (int i = 0; i < 30_000; i++) {
+            AtomicBoolean allStopped = new AtomicBoolean(true);
             envMicroEcosystemMap.forEach((env, runner) -> {
                 if (runner.isTaskRunner()) {
                     allStopped.set(false);
@@ -123,5 +130,36 @@ public class DataMockTaskService {
             }
         }
         log.info("完成");
+    }
+
+    private void releaseExecutor() {
+        // 步骤1：拒绝接收新的任务
+        scheduledExecutorService.shutdown();
+
+        // 步骤2：等待任务完成（设置超时时间，避免无限阻塞）
+        boolean isTerminated;
+        try {
+            // 等待30秒：可根据业务调整（若任务执行时间较长，可适当延长）
+            isTerminated = scheduledExecutorService.awaitTermination(30, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            // 若等待被中断，主动中断线程池的任务
+            Thread.currentThread().interrupt(); // 恢复中断状态，避免影响其他逻辑
+            isTerminated = false;
+            log.warn("Await termination of executor was interrupted", e);
+        }
+
+        // 步骤3：若超时未完成，强制终止所有任务（兜底策略）
+        if (!isTerminated) {
+            log.warn("Executor did not terminate in 30 seconds, forcing shutdown...");
+            scheduledExecutorService.shutdownNow(); // 强制中断正在执行的任务，清空队列
+            // 再次等待强制终止完成
+            try {
+                if (!scheduledExecutorService.awaitTermination(10, TimeUnit.SECONDS)) {
+                    log.error("Executor still not terminated after force shutdown");
+                }
+            } catch (InterruptedException e) {
+                log.warn("Executor still not terminated after force shutdown.", e);
+            }
+        }
     }
 }

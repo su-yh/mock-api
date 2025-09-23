@@ -67,12 +67,14 @@ public class MicroEcosystem {
 
         DynamicRoutingDataSource dynamicRoutingDataSource = context.getBean(DynamicRoutingDataSource.class);
 
-        try (HikariDataSourcePlus hikariCds = new HikariDataSourcePlus();
-             HikariDataSourcePlus hikariPg = new HikariDataSourcePlus()) {
+        try {
             Assert.isTrue(cdsDataSource.getEnv().equals(env),
                     String.format("env not match, env: %s, dataSourceEnv: %s, dataSourceEntity id: %d", env, cdsDataSource.getEnv(), cdsDataSource.getId()));
             Assert.isTrue(pgDataSource.getEnv().equals(env),
                     String.format("env not match, env: %s, dataSourceEnv: %s, dataSourceEntity id: %d", env, pgDataSource.getEnv(), pgDataSource.getId()));
+
+            HikariDataSourcePlus hikariCds = new HikariDataSourcePlus();
+            HikariDataSourcePlus hikariPg = new HikariDataSourcePlus();
 
             initHikariDataSourcePlus(hikariCds, cdsDataSource, LOCATIONS_CDS);
             initHikariDataSourcePlus(hikariPg, pgDataSource, LOCATIONS_PG);
@@ -135,6 +137,10 @@ public class MicroEcosystem {
 
     // 停止通知，并非实际停止标志
     public synchronized void stop() {
+        if (taskExecutor == null) {
+            return;
+        }
+
         taskExecutor.finished();
     }
 
@@ -150,12 +156,12 @@ public class MicroEcosystem {
             return;
         }
 
-        log.info("task executor finished. env: {}", env);
         String curEnv = mockPropertiesEntity.getEnv();
         if (!env.equals(curEnv)) {
             return;
         }
 
+        log.info("task executor finished. env: {}", env);
         // 任务完成，释放线程对象
         taskExecutor = null;
     }
@@ -163,38 +169,6 @@ public class MicroEcosystem {
     public boolean isTaskRunner() {
         return taskExecutor != null;
     }
-
-    // protected void releaseExecutor() {
-    //     // 步骤1：拒绝接收新的任务
-    //     scheduledExecutorService.shutdown();
-    //
-    //     // 步骤2：等待任务完成（设置超时时间，避免无限阻塞）
-    //     boolean isTerminated;
-    //     try {
-    //         // 等待30秒：可根据业务调整（若任务执行时间较长，可适当延长）
-    //         isTerminated = scheduledExecutorService.awaitTermination(30, TimeUnit.SECONDS);
-    //     } catch (InterruptedException e) {
-    //         // 若等待被中断，主动中断线程池的任务
-    //         Thread.currentThread().interrupt(); // 恢复中断状态，避免影响其他逻辑
-    //         isTerminated = false;
-    //         log.warn("Await termination of executor was interrupted", e);
-    //     }
-    //
-    //     // 步骤3：若超时未完成，强制终止所有任务（兜底策略）
-    //     if (!isTerminated) {
-    //         log.warn("Executor did not terminate in 30 seconds, forcing shutdown...");
-    //         scheduledExecutorService.shutdownNow(); // 强制中断正在执行的任务，清空队列
-    //         // 再次等待强制终止完成
-    //         try {
-    //             if (!scheduledExecutorService.awaitTermination(10, TimeUnit.SECONDS)) {
-    //                 log.error("Executor still not terminated after force shutdown");
-    //             }
-    //         } catch (InterruptedException e) {
-    //             log.warn("Executor still not terminated after force shutdown.", e);
-    //         }
-    //     }
-    // }
-
 }
 
 

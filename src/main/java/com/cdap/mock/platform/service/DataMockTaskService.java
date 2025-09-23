@@ -40,8 +40,8 @@ public class DataMockTaskService {
 
     private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
     // key: env
-    private final ReentrantLock envTaskRunnerMapLock = new ReentrantLock();
     private final Map<String, MicroEcosystem> envMicroEcosystemMap = new ConcurrentHashMap<>();
+    private final ReentrantLock envTaskRunnerMapLock = new ReentrantLock();
 
     @DSTransactional
     public void controlTargetActivity(@NonNull String env, StartStopEnums control) {
@@ -76,10 +76,9 @@ public class DataMockTaskService {
                     if (microEcosystem == null) {
                         microEcosystem = new MicroEcosystem(context, propertiesConfigEntity, cdsDataSource, pgDataSource, scheduledExecutorService);
                         microEcosystem.init();
-                        microEcosystem.start();
-
                         envMicroEcosystemMap.put(env, microEcosystem);
                     }
+                    microEcosystem.start();
                     break;
                 case STOP:
                     if (microEcosystem != null) {

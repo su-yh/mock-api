@@ -1,6 +1,5 @@
 package com.cdap.mock.platform.task.runner;
 
-import com.cdap.mock.platform.dao.mgr.entity.EnvDatasourcePropertiesEntity;
 import com.cdap.mock.platform.dao.mgr.entity.MockPropertiesEntity;
 import com.cdap.mock.util.IdGenerator;
 import lombok.extern.slf4j.Slf4j;
@@ -14,10 +13,8 @@ public class TimerJobTaskExecutorThread extends AbstractTaskExecutor {
     public TimerJobTaskExecutorThread(
             ApplicationContext context,
             MockPropertiesEntity mockPropertiesEntity,
-            EnvDatasourcePropertiesEntity cdsDataSource,
-            EnvDatasourcePropertiesEntity pgDataSource,
             IdGenerator idGenerator) {
-        super(context, mockPropertiesEntity, cdsDataSource, pgDataSource, idGenerator);
+        super(context, mockPropertiesEntity, idGenerator);
     }
 
     @Override

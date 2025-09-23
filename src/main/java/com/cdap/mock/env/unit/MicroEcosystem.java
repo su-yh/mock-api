@@ -49,7 +49,7 @@ public class MicroEcosystem {
     private AbstractTaskExecutor taskExecutor;
 
     public void init() {
-        if (!initFlag.getAndSet(true)) {
+        if (initFlag.getAndSet(true)) {
             return;
         }
 
@@ -117,11 +117,11 @@ public class MicroEcosystem {
         switch (mockMode) {
             case TIMER_JOB:
                 taskExecutor = new TimerJobTaskExecutorThread(
-                        context, mockPropertiesEntity, cdsDataSource, pgDataSource, idGenerator);
+                        context, mockPropertiesEntity, idGenerator);
                 break;
             case DATE_RAGE:
                 taskExecutor = new TimestampRangeTaskExecutorThread(
-                        context, mockPropertiesEntity, cdsDataSource, pgDataSource, idGenerator);
+                        context, mockPropertiesEntity, idGenerator);
                 break;
             case NONE:
             default:

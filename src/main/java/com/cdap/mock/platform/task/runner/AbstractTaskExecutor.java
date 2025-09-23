@@ -33,7 +33,6 @@ import com.cdap.mock.platform.dao.cdappgsql.mapper.AdKeywordsCampaignMapper;
 import com.cdap.mock.platform.dao.cdappgsql.mapper.AdjustAdMapper;
 import com.cdap.mock.platform.dao.cdappgsql.mapper.AdjustCostRecordMapper;
 import com.cdap.mock.platform.dao.cdappgsql.mapper.AdjustUserMapper;
-import com.cdap.mock.platform.dao.mgr.entity.EnvDatasourcePropertiesEntity;
 import com.cdap.mock.platform.dao.mgr.entity.MockPropertiesEntity;
 import com.cdap.mock.platform.task.common.EnvLocalThread;
 import com.cdap.mock.util.IdGenerator;
@@ -52,8 +51,6 @@ public abstract class AbstractTaskExecutor extends Thread {
 
     protected final ApplicationContext context;
     protected final MockPropertiesEntity mockPropertiesEntity;
-    protected final EnvDatasourcePropertiesEntity cdsDataSource;
-    protected final EnvDatasourcePropertiesEntity pgDataSource;
 
     protected final IdGenerator idGenerator;
 
@@ -110,25 +107,19 @@ public abstract class AbstractTaskExecutor extends Thread {
 
     @Override
     public void run() {
-        // DynamicRoutingDataSource dynamicRoutingDataSource = context.getBean(DynamicRoutingDataSource.class);
+        init();
 
         final String env = mockPropertiesEntity.getEnv();
         log.info("start, env: {}", env);
         EnvDsProcessor.ENV.set(env);
         EnvLocalThread.ENV_PROPERTIES_ENTITY_THREAD_LOCAL.set(mockPropertiesEntity);
-        // String envFlinkCds = env + EnvDsProcessor.SEPARATOR + DataSourceNames.FLINK_CDS;
-        // String envFlinkPg = env + EnvDsProcessor.SEPARATOR + DataSourceNames.FLINK_PG_CDAP;
 
         try {
             doRun();
         } catch (Exception e) {
             log.error("some exception happened.", e);
         } finally {
-            // dynamicRoutingDataSource.removeDataSource(envFlinkPg);
-            // dynamicRoutingDataSource.removeDataSource(envFlinkCds);
-
             EnvLocalThread.ENV_PROPERTIES_ENTITY_THREAD_LOCAL.remove();
-
             EnvDsProcessor.ENV.remove();
 
             context.publishEvent(new EnvTaskFinishedEvent(env));
@@ -137,156 +128,9 @@ public abstract class AbstractTaskExecutor extends Thread {
 
     protected abstract void doRun();
 
-    // protected void releaseExecutor() {
-    //     // 步骤1：拒绝接收新的任务
-    //     scheduledExecutorService.shutdown();
-    //
-    //     // 步骤2：等待任务完成（设置超时时间，避免无限阻塞）
-    //     boolean isTerminated;
-    //     try {
-    //         // 等待30秒：可根据业务调整（若任务执行时间较长，可适当延长）
-    //         isTerminated = scheduledExecutorService.awaitTermination(30, TimeUnit.SECONDS);
-    //     } catch (InterruptedException e) {
-    //         // 若等待被中断，主动中断线程池的任务
-    //         Thread.currentThread().interrupt(); // 恢复中断状态，避免影响其他逻辑
-    //         isTerminated = false;
-    //         log.warn("Await termination of executor was interrupted", e);
-    //     }
-    //
-    //     // 步骤3：若超时未完成，强制终止所有任务（兜底策略）
-    //     if (!isTerminated) {
-    //         log.warn("Executor did not terminate in 30 seconds, forcing shutdown...");
-    //         scheduledExecutorService.shutdownNow(); // 强制中断正在执行的任务，清空队列
-    //         // 再次等待强制终止完成
-    //         try {
-    //             if (!scheduledExecutorService.awaitTermination(10, TimeUnit.SECONDS)) {
-    //                 log.error("Executor still not terminated after force shutdown");
-    //             }
-    //         } catch (InterruptedException e) {
-    //             log.warn("Executor still not terminated after force shutdown.", e);
-    //         }
-    //     }
-    // }
-
-
-
-    @Override
-    public synchronized void start() {
-        // 只能执行一次。
-        init();
-
-        // TODO: suyh - 发布事件，让当前环境的状态变更为运行中。
-        //  同时检查运行状态，这里不能检查状态哟，重启或者异常停止时需要恢复
-//        context.publishEvent(null);
-
-        super.start();
-    }
-
     public void finished() {
         String env = mockPropertiesEntity.getEnv();
         log.info("finished, env: {}", env);
         stopFlag.set(true);
     }
-
-    // /**
-    //  * 使用通知-唤醒 的方式，主要是使得所有的数据库操作在同一个线程中，因为每个环境的数据库都是基于线程控制的。
-    //  * 如果不在当前环境的线程，那么基本上是null 错误，一般不会跑到其他环境的线程中去。
-    //  */
-    // protected void mockByTimeJob() {
-    //     // 添加定时通知任务
-    //     scheduledExecutorService.scheduleWithFixedDelay(
-    //             this::wakeUp, 2_000, 100, TimeUnit.MILLISECONDS);
-    //
-    //     dataMockTick();
-    // }
-    //
-    // /**
-    //  * 发起唤醒动作
-    //  *
-    //  * @see #dataMockTick()
-    //  */
-    // protected void wakeUp() {
-    //     // 使用env 做锁控制
-    //     final String env = mockPropertiesEntity.getEnv();
-    //     try {
-    //         synchronized (env) {
-    //             env.notifyAll();
-    //         }
-    //     } catch (Exception e) {
-    //         log.error("some exception happened.", e);
-    //     }
-    // }
-    //
-    // /**
-    //  * @see #wakeUp()
-    //  */
-    // protected void dataMockTick() {
-    //     // 使用env 做锁控制
-    //     final String env = mockPropertiesEntity.getEnv();
-    //     long lastTs = 0L;
-    //
-    //     while (true) {
-    //         if (stopFlag.get()) {
-    //             log.info("STOP FLAG is true.");
-    //             break;
-    //         }
-    //
-    //         // 等待被唤醒
-    //         synchronized (env) {
-    //             try {
-    //                 env.wait(10000000);
-    //             } catch (InterruptedException e) {
-    //                 log.warn("wait Interrupted.", e);
-    //             } catch (Exception e) {
-    //                 log.error("some exception happened.", e);
-    //             }
-    //         }
-    //
-    //         // 超过间隔时间才可以执行下一次的tick 任务
-    //         long curTs = System.currentTimeMillis();
-    //         if (curTs - lastTs > INTERVAL_MILLIS) {
-    //             mockDataTask.doDataMockTick(curTs);
-    //             lastTs = System.currentTimeMillis();
-    //         }
-    //     }
-    // }
-    //
-    // protected void mockByDateRage() {
-    //     CdapStopWatch stopWatch = new CdapStopWatch("dateRage");
-    //     try {
-    //         log.info("MOCK RANGE START...");
-    //         stopWatch.start();
-    //         doMockByDateRage(INTERVAL_MILLIS);
-    //     } catch (Exception e) {
-    //         log.error("SOME EXCEPTION HAPPENED.", e);
-    //         throw new RuntimeException(e);
-    //     } finally {
-    //         stopWatch.stop();
-    //         log.info("\n" +
-    //                         "##########################\n" +
-    //                         "# MOCK RANGE FINISHED. \n" +
-    //                         "##########################\n" +
-    //                         "{}",
-    //                 stopWatch.prettyPrint());
-    //     }
-    // }
-    //
-    // public void doMockByDateRage(long intervalMillis) {
-    //     Long timestampBegin = mockDataTask.obtainDateRangeTimeBegin();
-    //     if (timestampBegin == null) {
-    //         log.error("timeBegin is null}");
-    //         return;
-    //     }
-    //
-    //     long timestampEnd = mockPropertiesEntity.getTsEnd();
-    //
-    //     for (long timestamp = timestampBegin; timestamp < timestampEnd; timestamp += intervalMillis) {
-    //         if (stopFlag.get()) {
-    //             log.info("STOP FLAG is true.");
-    //             break;
-    //         }
-    //
-    //         mockDataTask.doDataMockTick(timestamp);
-    //     }
-    // }
 }

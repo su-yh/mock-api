@@ -62,6 +62,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author suyh
  * @since 2025-08-05
  */
+@Deprecated // TODO: suyh - 没有地方使用了。
 @RequiredArgsConstructor
 @Slf4j
 public class EnvTaskRunner extends Thread {

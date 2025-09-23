@@ -1,14 +1,14 @@
 package com.cdap.mock.platform.controller;
 
+import com.cdap.mock.constants.StartStopEnums;
 import com.cdap.mock.platform.service.DataMockTaskService;
-import com.web.sys.dto.base.SingleStringBody;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -25,7 +25,14 @@ public class DataMockTaskController {
 
     @Operation(summary = "启动某个环境对应的任务")
     @RequestMapping(value = "/start", method = RequestMethod.POST)
-    public void startTask(@RequestBody @Validated SingleStringBody body) {
-        dataMockTaskService.startTask(body.getBody());
+    public void startTask(@RequestParam String env) {
+        dataMockTaskService.controlTargetActivity(env, StartStopEnums.START);
     }
+
+    @Operation(summary = "停止某个环境对应的任务")
+    @RequestMapping(value = "/stop", method = RequestMethod.POST)
+    public void stopTask(@RequestParam String env) {
+        dataMockTaskService.controlTargetActivity(env, StartStopEnums.STOP);
+    }
+
 }

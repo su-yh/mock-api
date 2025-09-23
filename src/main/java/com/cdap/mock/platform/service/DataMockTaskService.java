@@ -2,13 +2,14 @@ package com.cdap.mock.platform.service;
 
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
 import com.base.web.exception.ExceptionUtil;
-import com.cdap.mock.event.EnvTaskFinishedEvent;
-import com.cdap.mock.platform.dao.mgr.entity.EnvDatasourcePropertiesEntity;
-import com.cdap.mock.platform.dao.mgr.entity.MockPropertiesEntity;
-import com.cdap.mock.platform.dao.mgr.entity.MockEnvConfigEntity;
-import com.cdap.mock.platform.task.runner.EnvTaskRunner;
 import com.cdap.mock.constants.DataSourceEnums;
 import com.cdap.mock.constants.ErrorCodeEnums;
+import com.cdap.mock.constants.StartStopEnums;
+import com.cdap.mock.event.EnvTaskFinishedEvent;
+import com.cdap.mock.platform.dao.mgr.entity.EnvDatasourcePropertiesEntity;
+import com.cdap.mock.platform.dao.mgr.entity.MockEnvConfigEntity;
+import com.cdap.mock.platform.dao.mgr.entity.MockPropertiesEntity;
+import com.cdap.mock.platform.task.runner.EnvTaskRunner;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
@@ -19,6 +20,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author suyh
@@ -34,10 +36,11 @@ public class DataMockTaskService {
     private final EnvDatasourcePropertiesService envDatasourcePropertiesService;
 
     // key: env
+    private final ReentrantLock envTaskRunnerMapLock = new ReentrantLock();
     private final Map<String, EnvTaskRunner> envTaskRunnerMap = new ConcurrentHashMap<>();
 
     @DSTransactional
-    public void startTask(@NonNull String env) {
+    public void controlTargetActivity(@NonNull String env, StartStopEnums control) {
         MockEnvConfigEntity envConfigEntity = mockEnvConfigService.selectEntityByEnv(env);
         if (envConfigEntity == null) {
             throw ExceptionUtil.business(ErrorCodeEnums.ITEM_NOT_FOUND, "环境对象", env);
@@ -60,10 +63,28 @@ public class DataMockTaskService {
             throw ExceptionUtil.business(ErrorCodeEnums.ITEM_NOT_FOUND, "数据源配置", String.format("env(%s), name(%s)", env, DataSourceEnums.FLINK_PG_CDAP.getCode()));
         }
 
-        EnvTaskRunner envTaskRunner = envTaskRunnerMap.computeIfAbsent(env, e -> new EnvTaskRunner(context, propertiesConfigEntity, cdsDataSource, pgDataSource));
-        synchronized (envTaskRunner) {
-            envTaskRunner.init();
-            envTaskRunner.start();
+        envTaskRunnerMapLock.lock();
+
+        try {
+            EnvTaskRunner envTaskRunner = envTaskRunnerMap.get(env);
+            switch (control) {
+                case START:
+                    if (envTaskRunner == null) {
+                        envTaskRunner = new EnvTaskRunner(context, propertiesConfigEntity, cdsDataSource, pgDataSource);
+                    }
+                    envTaskRunner.init();
+                    envTaskRunner.start();
+                    break;
+                case STOP:
+                    if (envTaskRunner != null) {
+                        envTaskRunner.finished();
+                    }
+                    break;
+                default:
+                    break;
+            }
+        } finally {
+            envTaskRunnerMapLock.unlock();
         }
     }
 

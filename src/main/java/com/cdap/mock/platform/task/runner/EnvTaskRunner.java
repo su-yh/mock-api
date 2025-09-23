@@ -56,6 +56,7 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author suyh
@@ -71,6 +72,8 @@ public class EnvTaskRunner extends Thread {
     private final static long INTERVAL_MILLIS = 60_000L;
 
     private boolean initFlag = false;
+
+    private final AtomicBoolean stopFlag = new AtomicBoolean(false);
 
     private final ApplicationContext context;
     private final MockPropertiesEntity mockPropertiesEntity;
@@ -176,14 +179,21 @@ public class EnvTaskRunner extends Thread {
                     break;
                 case DATE_RAGE:
                     mockByDateRage();
+                    stopFlag.set(true);
                     break;
                 case TS_RANGE:
                     log.error("未实现");
+                    stopFlag.set(true);
                     break;
                 case NONE:
                 default:
                     log.info("DATA MOCK IS DISABLED.");
+                    stopFlag.set(true);
                     break;
+            }
+
+            while (!stopFlag.get()) {
+                TimeUnit.MILLISECONDS.sleep(1);
             }
         } catch (Exception e) {
             log.error("some exception happened.", e);
@@ -259,6 +269,10 @@ public class EnvTaskRunner extends Thread {
         super.start();
     }
 
+    public void finished() {
+        stopFlag.set(true);
+    }
+
     public void dataMockTick() {
         try {
             long currentTimeMillis = System.currentTimeMillis();
@@ -270,8 +284,7 @@ public class EnvTaskRunner extends Thread {
 
 
     private void mockByTimeJob() {
-        ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
-        scheduledExecutor.scheduleWithFixedDelay(
+        scheduledExecutorService.scheduleWithFixedDelay(
                 this::dataMockTick, 20_000, INTERVAL_MILLIS, TimeUnit.MILLISECONDS);
     }
 
@@ -305,6 +318,11 @@ public class EnvTaskRunner extends Thread {
         long timestampEnd = mockPropertiesEntity.getTsEnd();
 
         for (long timestamp = timestampBegin; timestamp < timestampEnd; timestamp += intervalMillis) {
+            if (stopFlag.get()) {
+                log.info("STOP FLAG is true.");
+                break;
+            }
+
             mockDataTask.doDataMockTick(timestamp);
         }
     }

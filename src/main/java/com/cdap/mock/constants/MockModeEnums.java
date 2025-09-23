@@ -13,7 +13,7 @@ public enum MockModeEnums {
     NONE(0),
     TIMER_JOB(1),
     DATE_RAGE(2),
-    TS_RANGE(3),
+//    TS_RANGE(3),
     ;
 
     @JsonValue

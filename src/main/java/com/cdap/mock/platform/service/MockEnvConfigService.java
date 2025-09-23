@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -37,6 +38,8 @@ public class MockEnvConfigService {
     }
 
     public void updateById(MockEnvConfigEntity updateEntity) {
+        updateEntity.setEnv(null);  // 环境数据不可修改
+        updateEntity.setUpdated(new Date());
         mockEnvConfigMapper.updateById(updateEntity);
     }
 

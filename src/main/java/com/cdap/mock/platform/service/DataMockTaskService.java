@@ -13,6 +13,7 @@ import com.cdap.mock.platform.task.runner.EnvTaskRunner;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -98,5 +100,32 @@ public class DataMockTaskService {
         }
 
         envTaskRunnerMap.remove(env);
+    }
+
+    // 优雅停机
+    @EventListener(ContextClosedEvent.class)
+    public void onContextClosed(ContextClosedEvent event) {
+        log.info("收到停机信号");
+        envTaskRunnerMapLock.lock();
+        try {
+            envTaskRunnerMap.forEach((env, runner) -> {
+                runner.finished();
+            });
+        } finally {
+            envTaskRunnerMapLock.unlock();
+        }
+
+        log.info("等待所有线程停机");
+        // 等30 秒，所有的线程都停止
+        for (int i = 0; i < 30_000; i++) {
+            if (envTaskRunnerMap.isEmpty()) {
+                break;
+            }
+            try {
+                TimeUnit.MILLISECONDS.sleep(1);
+            } catch (InterruptedException ignore) {
+            }
+        }
+        log.info("完成");
     }
 }

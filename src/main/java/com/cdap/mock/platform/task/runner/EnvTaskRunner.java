@@ -171,7 +171,7 @@ public class EnvTaskRunner extends Thread {
 
             MockModeEnums mockMode = mockPropertiesEntity.getMode();
 
-            log.info("CURRENT DATA MOCK MODE: {}.", mockMode);
+            log.info("env: {}, CURRENT DATA MOCK MODE: {}.", env, mockMode);
 
             switch (mockMode) {
                 case TIMER_JOB:
@@ -179,21 +179,11 @@ public class EnvTaskRunner extends Thread {
                     break;
                 case DATE_RAGE:
                     mockByDateRage();
-                    stopFlag.set(true);
-                    break;
-                case TS_RANGE:
-                    log.error("未实现");
-                    stopFlag.set(true);
                     break;
                 case NONE:
                 default:
-                    log.info("DATA MOCK IS DISABLED.");
-                    stopFlag.set(true);
+                    log.info("env: {}, DATA MOCK IS DISABLED.", env);
                     break;
-            }
-
-            while (!stopFlag.get()) {
-                TimeUnit.MILLISECONDS.sleep(1);
             }
         } catch (Exception e) {
             log.error("some exception happened.", e);
@@ -276,19 +266,67 @@ public class EnvTaskRunner extends Thread {
         stopFlag.set(true);
     }
 
-    public void dataMockTick() {
+    /**
+     * 使用通知-唤醒 的方式，主要是使得所有的数据库操作在同一个线程中，因为每个环境的数据库都是基于线程控制的。
+     * 如果不在当前环境的线程，那么基本上是null 错误，一般不会跑到其他环境的线程中去。
+     */
+    private void mockByTimeJob() {
+        // 添加定时通知任务
+        scheduledExecutorService.scheduleWithFixedDelay(
+                this::wakeUp, 2_000, 100, TimeUnit.MILLISECONDS);
+
+        dataMockTick();
+    }
+
+    /**
+     * 发起唤醒动作
+     *
+     * @see #dataMockTick()
+     */
+    private void wakeUp() {
+        // 使用env 做锁控制
+        final String env = mockPropertiesEntity.getEnv();
         try {
-            long currentTimeMillis = System.currentTimeMillis();
-            mockDataTask.doDataMockTick(currentTimeMillis);
+            synchronized (env) {
+                env.notifyAll();
+            }
         } catch (Exception e) {
             log.error("some exception happened.", e);
         }
     }
 
+    /**
+     * @see #wakeUp()
+     */
+    private void dataMockTick() {
+        // 使用env 做锁控制
+        final String env = mockPropertiesEntity.getEnv();
+        long lastTs = 0L;
 
-    private void mockByTimeJob() {
-        scheduledExecutorService.scheduleWithFixedDelay(
-                this::dataMockTick, 20_000, INTERVAL_MILLIS, TimeUnit.MILLISECONDS);
+        while (true) {
+            if (stopFlag.get()) {
+                log.info("STOP FLAG is true.");
+                break;
+            }
+
+            // 等待被唤醒
+            synchronized (env) {
+                try {
+                    env.wait(10000000);
+                } catch (InterruptedException e) {
+                    log.warn("wait Interrupted.", e);
+                } catch (Exception e) {
+                    log.error("some exception happened.", e);
+                }
+            }
+
+            // 超过间隔时间才可以执行下一次的tick 任务
+            long curTs = System.currentTimeMillis();
+            if (curTs - lastTs > INTERVAL_MILLIS) {
+                mockDataTask.doDataMockTick(curTs);
+                lastTs = System.currentTimeMillis();
+            }
+        }
     }
 
     private void mockByDateRage() {

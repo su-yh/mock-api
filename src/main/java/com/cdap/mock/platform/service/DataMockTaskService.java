@@ -5,23 +5,24 @@ import com.base.web.exception.ExceptionUtil;
 import com.cdap.mock.constants.DataSourceEnums;
 import com.cdap.mock.constants.ErrorCodeEnums;
 import com.cdap.mock.constants.StartStopEnums;
-import com.cdap.mock.event.EnvTaskFinishedEvent;
+import com.cdap.mock.env.unit.MicroEcosystem;
 import com.cdap.mock.platform.dao.mgr.entity.EnvDatasourcePropertiesEntity;
 import com.cdap.mock.platform.dao.mgr.entity.MockEnvConfigEntity;
 import com.cdap.mock.platform.dao.mgr.entity.MockPropertiesEntity;
-import com.cdap.mock.platform.task.runner.EnvTaskRunner;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -32,14 +33,15 @@ import java.util.concurrent.locks.ReentrantLock;
 @Service
 @Slf4j
 public class DataMockTaskService {
-    private final ApplicationContext context;
+    private final ConfigurableApplicationContext context;
     private final MockEnvConfigService mockEnvConfigService;
     private final MockPropertiesConfigService mockPropertiesConfigService;
     private final EnvDatasourcePropertiesService envDatasourcePropertiesService;
 
+    private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
     // key: env
     private final ReentrantLock envTaskRunnerMapLock = new ReentrantLock();
-    private final Map<String, EnvTaskRunner> envTaskRunnerMap = new ConcurrentHashMap<>();
+    private final Map<String, MicroEcosystem> envMicroEcosystemMap = new ConcurrentHashMap<>();
 
     @DSTransactional
     public void controlTargetActivity(@NonNull String env, StartStopEnums control) {
@@ -68,20 +70,20 @@ public class DataMockTaskService {
         envTaskRunnerMapLock.lock();
 
         try {
-            EnvTaskRunner envTaskRunner = envTaskRunnerMap.get(env);
+            MicroEcosystem microEcosystem = envMicroEcosystemMap.get(env);
             switch (control) {
                 case START:
-                    if (envTaskRunner == null) {
-                        envTaskRunner = new EnvTaskRunner(context, propertiesConfigEntity, cdsDataSource, pgDataSource);
-                        envTaskRunnerMap.put(env, envTaskRunner);
+                    if (microEcosystem == null) {
+                        microEcosystem = new MicroEcosystem(context, propertiesConfigEntity, cdsDataSource, pgDataSource, scheduledExecutorService);
+                        microEcosystem.init();
+                        microEcosystem.start();
 
-                        envTaskRunner.init();
-                        envTaskRunner.start();
+                        envMicroEcosystemMap.put(env, microEcosystem);
                     }
                     break;
                 case STOP:
-                    if (envTaskRunner != null) {
-                        envTaskRunner.finished();
+                    if (microEcosystem != null) {
+                        microEcosystem.stop();
                     }
                     break;
                 default:
@@ -92,33 +94,27 @@ public class DataMockTaskService {
         }
     }
 
-    @EventListener
-    public void listenerEnvTaskFinishedEvent(EnvTaskFinishedEvent event) {
-        String env = event.getEnv();
-        if (!StringUtils.hasText(env)) {
-            return;
-        }
-
-        envTaskRunnerMap.remove(env);
-    }
-
     // 优雅停机
     @EventListener(ContextClosedEvent.class)
     public void onContextClosed(ContextClosedEvent event) {
         log.info("收到停机信号");
-        envTaskRunnerMapLock.lock();
-        try {
-            envTaskRunnerMap.forEach((env, runner) -> {
-                runner.finished();
-            });
-        } finally {
-            envTaskRunnerMapLock.unlock();
+        if (envMicroEcosystemMap.isEmpty()) {
+            return;
         }
 
+        envMicroEcosystemMap.forEach((env, runner) -> runner.stop());
+
         log.info("等待所有线程停机");
+        AtomicBoolean allStopped = new AtomicBoolean(false);
         // 等30 秒，所有的线程都停止
         for (int i = 0; i < 30_000; i++) {
-            if (envTaskRunnerMap.isEmpty()) {
+            envMicroEcosystemMap.forEach((env, runner) -> {
+                if (runner.isTaskRunner()) {
+                    allStopped.set(false);
+                }
+            });
+
+            if (allStopped.get()) {
                 break;
             }
             try {

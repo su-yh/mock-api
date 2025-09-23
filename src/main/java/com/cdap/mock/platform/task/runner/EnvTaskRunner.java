@@ -270,6 +270,8 @@ public class EnvTaskRunner extends Thread {
     }
 
     public void finished() {
+        String env = mockPropertiesEntity.getEnv();
+        log.info("finished, env: {}", env);
         stopFlag.set(true);
     }
 

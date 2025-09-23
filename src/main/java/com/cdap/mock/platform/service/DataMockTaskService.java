@@ -71,6 +71,7 @@ public class DataMockTaskService {
                 case START:
                     if (envTaskRunner == null) {
                         envTaskRunner = new EnvTaskRunner(context, propertiesConfigEntity, cdsDataSource, pgDataSource);
+                        envTaskRunnerMap.put(env, envTaskRunner);
                     }
                     envTaskRunner.init();
                     envTaskRunner.start();

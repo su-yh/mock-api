@@ -83,6 +83,11 @@ base:
         password: suyh_mock_mgr
         flyway:
           enabled: true
+  mp:
+    sql:
+      # 关闭SQL 日志打印
+      enabled: false
+
 
 ---
 spring:

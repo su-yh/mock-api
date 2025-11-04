@@ -91,7 +91,9 @@ public class TbWithdrawalService extends AbstractHistoryRepeatService {
                             long ts = bdateMidnightTimestamp - offsetRnd * 1000L;
 
                             TbWithdrawalEntity entity = mockEntity(tbUser, ts);
-                            tbUserWithdrawalList.add(entity);
+                            if (entity != null) {
+                                tbUserWithdrawalList.add(entity);
+                            }
                         }
 
                         {
@@ -102,14 +104,18 @@ public class TbWithdrawalService extends AbstractHistoryRepeatService {
                             long ts = bdateMidnightTimestamp - offsetRnd * 1000L;
 
                             TbWithdrawalEntity entity = mockEntity(tbUser, ts);
-                            tbUserWithdrawalList.add(entity);
+                            if (entity != null) {
+                                tbUserWithdrawalList.add(entity);
+                            }
                         }
                     }
                 }
             }
 
             TbWithdrawalEntity tbUserWithdrawal = mockEntity(tbUser, timestampMillis);
-            tbUserWithdrawalList.add(tbUserWithdrawal);
+            if (tbUserWithdrawal != null) {
+                tbUserWithdrawalList.add(tbUserWithdrawal);
+            }
         }
 
         int rnd = random.nextInt(100);

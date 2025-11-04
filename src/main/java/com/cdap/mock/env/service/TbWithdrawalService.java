@@ -128,17 +128,28 @@ public class TbWithdrawalService extends AbstractHistoryRepeatService {
     }
 
     private TbWithdrawalEntity mockEntity(TbUserEntity tbUser, Long timestampMillis) {
+        long mtime = timestampMillis / 1000L;
+        long ctime = mtime - random.nextInt(180); // 创建订单时间在完成订单时间的半小时内，且不能比创建用户的时间更早
+        if (ctime < tbUser.getCtime()) {
+            ctime = tbUser.getCtime();
+        }
+
+        // 提现时间不能早于注册时间
+        if (mtime < tbUser.getCtime()) {
+            return null;
+        }
+
         TbWithdrawalEntity tbUserWithdrawal = new TbWithdrawalEntity();
         tbUserWithdrawal.setId(null);
         tbUserWithdrawal.setUid(tbUser.getUid());
-        tbUserWithdrawal.setCtime(timestampMillis / 1000L);
+        tbUserWithdrawal.setCtime(ctime);
         tbUserWithdrawal.setChannel(tbUser.getChannel());
         tbUserWithdrawal.setVungoWithdrawalId(-1L);
         tbUserWithdrawal.setOriginChannel(tbUser.getOriginChannel());
         tbUserWithdrawal.setGaid(tbUser.getGaid());
-        tbUserWithdrawal.setCts(timestampMillis / 1000L);
+        tbUserWithdrawal.setCts(ctime);
         tbUserWithdrawal.setPn(tbUser.getPn());
-        tbUserWithdrawal.setMtime(timestampMillis / 1000L);
+        tbUserWithdrawal.setMtime(mtime);
         tbUserWithdrawal.setLoginChannel(null);
         tbUserWithdrawal.setRegisterChannel(tbUser.getChannel());
 

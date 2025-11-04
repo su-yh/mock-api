@@ -11,6 +11,7 @@ import com.cdap.mock.vo.TickRuntime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
@@ -93,7 +94,9 @@ public class TbRechargeService extends AbstractHistoryRepeatService {
                             long ts = bdateMidnightTimestamp - offsetRnd * 1000L;
 
                             TbRechargeEntity entity = mockEntity(tbUser, ts);
-                            tbRechargeList.add(entity);
+                            if (entity != null) {
+                                tbRechargeList.add(entity);
+                            }
                         }
 
                         {
@@ -104,14 +107,18 @@ public class TbRechargeService extends AbstractHistoryRepeatService {
                             long ts = bdateMidnightTimestamp - offsetRnd * 1000L;
 
                             TbRechargeEntity entity = mockEntity(tbUser, ts);
-                            tbRechargeList.add(entity);
+                            if (entity != null) {
+                                tbRechargeList.add(entity);
+                            }
                         }
                     }
                 }
             }
 
             TbRechargeEntity tbUserRecharge = mockEntity(tbUser, timestampMillis);
-            tbRechargeList.add(tbUserRecharge);
+            if (tbUserRecharge != null) {
+                tbRechargeList.add(tbUserRecharge);
+            }
         }
 
         int rnd = random.nextInt(100);
@@ -129,11 +136,17 @@ public class TbRechargeService extends AbstractHistoryRepeatService {
         return tbRechargeList;
     }
 
+    @Nullable
     private TbRechargeEntity mockEntity(TbUserEntity tbUser, Long timestampMillis) {
         long mtime = timestampMillis / 1000L;
         long ctime = mtime - random.nextInt(180); // 创建订单时间在完成订单时间的半小时内，且不能比创建用户的时间更早
         if (ctime < tbUser.getCtime()) {
             ctime = tbUser.getCtime();
+        }
+
+        // 充值时间不能早于注册时间
+        if (mtime < tbUser.getCtime()) {
+            return null;
         }
 
         TbRechargeEntity tbUserRecharge = new TbRechargeEntity();
@@ -147,7 +160,7 @@ public class TbRechargeService extends AbstractHistoryRepeatService {
         tbUserRecharge.setOriginChannel(tbUser.getOriginChannel());
         String orderUuid = idGenerator.nextUuid();
         tbUserRecharge.setOrder("order_" + orderUuid);
-        tbUserRecharge.setCts(timestampMillis / 1000L);
+        tbUserRecharge.setCts(ctime);
         tbUserRecharge.setPn(tbUser.getPn());
         tbUserRecharge.setMtime(mtime);
         tbUserRecharge.setLoginChannel(null);

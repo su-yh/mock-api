@@ -1,11 +1,11 @@
 package com.cdap.mock.util;
 
+import org.apache.commons.codec.binary.Base32;
 import org.springframework.lang.NonNull;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Base64;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -13,11 +13,10 @@ import java.util.concurrent.TimeUnit;
 /**
  * 这里使用7 个字节来存储ID 值
  * 其中18 位用来存储增量值，剩下的38 位用来存储时间，在这些位里面，每一位表示1024 ms ，所以最大可使用约：8,925 年
- * 生成uuid 时，会随便生成一个数字，然后取低两字节与这7 个字节的数据组合，进行二进制位重新洗牌，生成一个新的9 字节数组，
- * 最后使用这个9 字节数据使用base64 编码生成一个12 个字节的uuid
  */
 public class IdGenerator {
     public static final Random RANDOM = new Random();
+    public static final Base32 B32 = new Base32(0, null, false, (byte) 0);
     // 一个时间单位内允许生成的ID数量（18位二进制）
     public static final int MAX_SEQUENCE = 1 << 18;
 
@@ -25,31 +24,27 @@ public class IdGenerator {
     protected long lastId;
 
     // 起始时间戳（UTC 2025-01-01）
-    protected final long startMs;
+    public final long startMs;
+    public final boolean shuffle = false;
 
     // id 的有效字节为7 个字节
     private static final int ID_BYTES = 7;
-    // uuid 占用9 个字节
-    private static final int UUID_BYTES = 9;
     // 复用的位存储数组（仅在同步方法内使用）
     // uuid 的二进制位数据存储
-    private static final boolean[] BITS_72 = new boolean[UUID_BYTES * Byte.SIZE];
+    private static final boolean[] BITS_56 = new boolean[ID_BYTES * Byte.SIZE];
 
-    // 固定乱序映射规则（0~71表示原始位索引，值表示新位置）
-    // 注意：需确保包含0~71每个数字恰好一次
-    private static final int[] SHUFFLE_RULE_72bit = {
-            35, 68, 26, 45, 12, 55,
-            18, 29, 40, 64, 24, 39,
-            15, 50, 62, 36, 57, 10,
-            49, 2, 31, 60, 44, 21,
-            5, 14, 47, 65, 34, 23,
-            70, 41, 19, 69, 59, 20,
-            3, 63, 51, 33, 7, 25,
-            42, 1, 53, 37, 0, 66,
-            11, 54, 30, 48, 6, 27,
-            58, 4, 16, 32, 67, 13,
-            28, 43, 9, 71, 56, 38,
-            8, 52, 22, 61, 17, 46
+    // 固定乱序映射规则（0~55表示原始位索引，值表示新位置）
+    // 注意：需确保包含0~56每个数字恰好一次
+    // 数组下标是新数据的下标位置
+    // 数组元素是原始数据的下标位置
+    private static final int[] SHUFFLE_RULE_56BIT = {
+            35, 26, 45, 12, 55, 18, 29, 40,
+            24, 39, 15, 50, 36, 10, 49, 2,
+            31, 44, 21, 5, 14, 47, 34, 23,
+            41, 19, 20, 3, 51, 33, 7, 25,
+            42, 1, 53, 37, 0, 11, 54, 30,
+            48, 6, 27, 4, 16, 32, 13, 28,
+            43, 9, 38, 8, 52, 22, 17, 46
     };
 
     public IdGenerator() {
@@ -76,9 +71,9 @@ public class IdGenerator {
         validateShuffleRule();
     }
 
-    // 验证乱序规则是否包含0~47所有数字，每个数字必须出现并且只出现一次
+    // 验证乱序规则是否包含0~55所有数字，每个数字必须出现并且只出现一次
     private void validateShuffleRule() {
-        validateShuffleRule(SHUFFLE_RULE_72bit, SHUFFLE_RULE_72bit.length);
+        validateShuffleRule(SHUFFLE_RULE_56BIT, SHUFFLE_RULE_56BIT.length);
     }
 
     private void validateShuffleRule(int[] shuffleRule, int size) {
@@ -91,6 +86,9 @@ public class IdGenerator {
         }
     }
 
+    /**
+     * 返回12 个字符长度的字符串
+     */
     @NonNull
     public synchronized String nextUuid() {
         String[] uuids = nextUuids(1);
@@ -105,8 +103,8 @@ public class IdGenerator {
 
         for (int i = 0; i < n; i++) {
             long id = startId + i;
-            byte[] ubs = shuffle72Bits(id);
-            uuids[i] = Base64.getEncoder().encodeToString(ubs);
+            byte[] ubs = shuffle ? shuffle56Bits(id) : mapping56Bits(id);
+            uuids[i] = B32.encodeToString(ubs);
         }
 
         return uuids;
@@ -137,34 +135,47 @@ public class IdGenerator {
         }
     }
 
+    private byte[] mapping56Bits(long id) {
+        byte[] bytes = new byte[ID_BYTES];
+
+        // 第一步：将 id 的低7字节映射到 bytes[0] ~ bytes[6]
+        // 每个字节8位，循环7个字节（0~6索引）
+        for (int byteIndex = 0; byteIndex < ID_BYTES; byteIndex++) {
+            // 计算当前字节对应的位移（每个字节占8位，低字节在前）
+            int shift = byteIndex * Byte.SIZE;
+            // 提取 id 中当前字节的8位数据（& 0xFF 确保只取低8位）
+            byte currentByte = (byte) ((id >> shift) & 0xFF);
+            // 存入字节数组对应位置
+            bytes[byteIndex] = currentByte;
+        }
+
+        return bytes;
+    }
+
     /**
+     * 这个本身没有问题，但是大小写敏感，如果使用mysql 数据库来写入唯一索引的数据时会发生冲突的情况
      * 随机一个 int
-     * 取id 的低48 位 和 随机值的 低24 位 乱序生成一个新的 9 字节数据
+     * 取id 的低56 位乱序生成一个新的 7 字节数据
+     *
      * @param id 原始id 值
      * @return 乱序后的字节数组
      */
-    protected byte[] shuffle72Bits(long id) {
+    protected byte[] shuffle56Bits(long id) {
         int indOffset = 0;
         // 每一位都存储为boolean 值
         // id 的有效二进制位数据放在前面的数组位置
         for (int i = 0; i < ID_BYTES * Byte.SIZE; i++) {
-            BITS_72[indOffset + i] = (id & (1L << i)) != 0;
-        }
-
-        // 随机值的低位，用来补充剩下的空位以达到 UUID_BYTES 个字节的数据
-        int randValue = RANDOM.nextInt();
-        indOffset = ID_BYTES * Byte.SIZE;
-        for (int i = 0; i < (UUID_BYTES - ID_BYTES) * Byte.SIZE; i++) {
-            BITS_72[indOffset + i] = (randValue & (1 << i)) != 0;
+            BITS_56[indOffset + i] = (id & (1L << i)) != 0;
         }
 
         // 按规则重排
-        byte[] shuffled = new byte[UUID_BYTES];
-        for (int i = 0; i < UUID_BYTES; i++) {
+        byte[] shuffled = new byte[ID_BYTES];
+        for (int i = 0; i < ID_BYTES; i++) {
+            shuffled[i] = 0;
             for (int j = 0; j < Byte.SIZE; j++) {
                 int ind = i * Byte.SIZE + j;    // 数组下标位置
-                int originalIndex = SHUFFLE_RULE_72bit[ind];
-                if (BITS_72[originalIndex]) {
+                int originalIndex = SHUFFLE_RULE_56BIT[ind];
+                if (BITS_56[originalIndex]) {
                     shuffled[i] |= (byte) (1 << j);
                 }
             }
